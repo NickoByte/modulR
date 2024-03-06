@@ -2,7 +2,11 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import { FlexLayout, FlexDirection } from "./layouts/FlexLayout";
+import {
+  FlexLayout,
+  FlexDirection,
+  FlexLayoutElement,
+} from "./layouts/FlexLayout";
 
 const gui = new GUI();
 const scene = new THREE.Scene();
@@ -20,11 +24,17 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const cubes = [
-  { width: 2, height: 1, group: createCube() },
-  { width: 1, height: 1, group: createCube() },
+  createLayoutElement(2, 1, 0.1, 0xff0000),
+  createLayoutElement(1, 1, 0.1, 0x00ff00),
+  createLayoutElement(3, 1, 0.1, 0x0000ff),
 ];
 
-const cubesLayout = new FlexLayout(FlexDirection.Row, 100, 100, cubes);
+const cubesLayout = new FlexLayout(
+  { direction: FlexDirection.Row },
+  100,
+  100,
+  cubes
+);
 cubes.forEach((cube) => {
   console.log(cube.group);
   scene.add(cube.group);
@@ -40,13 +50,18 @@ function animate() {
 
 animate();
 
-function createCube(
+function createLayoutElement(
   sizeX: number = 1,
   sizeY: number = 1,
-  sizeZ: number = 1
-): THREE.Group {
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  sizeZ: number = 1,
+  color: THREE.ColorRepresentation = 0xffffff
+): FlexLayoutElement {
+  const geometry = new THREE.BoxGeometry(sizeX, sizeY, sizeZ);
+  const material = new THREE.MeshBasicMaterial({ color: color });
   const cube = new THREE.Mesh(geometry, material);
-  return new THREE.Group().add(cube);
+  return {
+    width: sizeX,
+    height: sizeY,
+    group: new THREE.Group().add(cube),
+  };
 }

@@ -5,6 +5,10 @@ enum FlexDirection {
   Row,
 }
 
+type FlexProps = {
+  direction?: FlexDirection;
+};
+
 enum FlexGrow {}
 
 type FlexLayoutElement = {
@@ -15,18 +19,19 @@ type FlexLayoutElement = {
 
 class FlexLayout {
   constructor(
-    private direction: FlexDirection = FlexDirection.Row,
+    private props: FlexProps,
     private width: number,
     private height: number,
     private children: FlexLayoutElement[]
   ) {}
 
   recalculate() {
-    if (this.direction == FlexDirection.Row) {
+    if (this.props.direction == FlexDirection.Row) {
       let startPositionX = 0;
       this.children.forEach((child) => {
+        startPositionX += child.width / 2;
         child.group.position.setX(startPositionX);
-        startPositionX += child.width;
+        startPositionX += child.width / 2;
       });
     } else {
     }
