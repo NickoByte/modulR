@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ElementSize, FractionSize, PercentageSize, UnitSize } from "./Sizes";
 
 enum LayoutDirection {
   Column,
@@ -18,20 +19,6 @@ type LayoutProps = {
   padding?: LayoutPadding;
 };
 
-enum SizeType {
-  Unit,
-  Percentage,
-  Fraction,
-}
-
-type PercentageSize = { value: number; type: SizeType.Percentage };
-
-type UnitSize = { value: number; type: SizeType.Unit };
-
-type FractionSize = { value: number; type: SizeType.Fraction };
-
-type ElementSize = PercentageSize | UnitSize | FractionSize;
-
 type LayoutElement = {
   width: ElementSize;
   height: ElementSize;
@@ -49,17 +36,14 @@ class AutoLayout {
     if (this.props.direction == LayoutDirection.Row) {
       const convertedChildren = [...this.children];
       convertedChildren.forEach((child) => {
-        if (child.width.type === SizeType.Percentage) {
-          child.width = {
-            value: (child.width.value / 100) * this.width,
-            type: SizeType.Unit,
-          };
+        if (child.width instanceof PercentageSize) {
+          child.width = child.width.asUnitSize(this.width);
         }
       });
 
       let widthSum = 0;
       convertedChildren.forEach((child) => {
-        if (child.width.type === SizeType.Unit) {
+        if (child.width instanceof UnitSize) {
           widthSum += child.width.value;
         }
       });
@@ -68,17 +52,14 @@ class AutoLayout {
 
       let fractionsSum = 0;
       convertedChildren.forEach((child) => {
-        if (child.width.type === SizeType.Fraction) {
+        if (child.width instanceof FractionSize) {
           fractionsSum += child.width.value;
         }
       });
 
       convertedChildren.forEach((child) => {
-        if (child.width.type === SizeType.Fraction) {
-          child.width = {
-            value: (child.width.value / fractionsSum) * widthLeft,
-            type: SizeType.Unit,
-          };
+        if (child.width instanceof FractionSize) {
+          child.width = child.width.asUnitSize(widthLeft, fractionsSum);
         }
       });
 

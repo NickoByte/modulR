@@ -6,9 +6,8 @@ import {
   AutoLayout,
   LayoutElement,
   LayoutDirection,
-  ElementSize,
-  SizeType,
-} from "./layouts/FlexLayout";
+} from "./layouts/AutoLayout";
+import { ElementSize, Size } from "./layouts/Sizes";
 
 const gui = new GUI();
 let properties = { width: 10 };
@@ -62,36 +61,12 @@ function redrawLayout(width: number) {
   cubesContainer.clear();
 
   const cubes = [
-    createLayoutElement(
-      { value: 1, type: SizeType.Unit },
-      { value: 1, type: SizeType.Unit },
-      0xff0000
-    ),
-    createLayoutElement(
-      { value: 2, type: SizeType.Unit },
-      { value: 1, type: SizeType.Unit },
-      0x00ff00
-    ),
-    createLayoutElement(
-      { value: 1, type: SizeType.Fraction },
-      { value: 1, type: SizeType.Fraction },
-      0x0000ff
-    ),
-    createLayoutElement(
-      { value: 2, type: SizeType.Fraction },
-      { value: 2, type: SizeType.Fraction },
-      0xff0000
-    ),
-    createLayoutElement(
-      { value: 10, type: SizeType.Percentage },
-      { value: 10, type: SizeType.Percentage },
-      0x00ff00
-    ),
-    createLayoutElement(
-      { value: 10, type: SizeType.Percentage },
-      { value: 10, type: SizeType.Percentage },
-      0x0000ff
-    ),
+    createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+    createLayoutElement(Size.Unit(2), Size.Unit(1), 0x00ff00),
+    createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0x0000ff),
+    createLayoutElement(Size.Fraction(2), Size.Fraction(2), 0xff0000),
+    createLayoutElement(Size.Percentage(10), Size.Percentage(10), 0x00ff00),
+    createLayoutElement(Size.Percentage(10), Size.Percentage(10), 0x0000ff),
   ];
 
   const cubesLayout = new AutoLayout(
