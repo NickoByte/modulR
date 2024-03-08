@@ -24,6 +24,7 @@ type LayoutElement = {
   height: ElementSize;
   group: THREE.Group;
 };
+
 class AutoLayout {
   constructor(
     private props: LayoutProps,
@@ -34,32 +35,29 @@ class AutoLayout {
 
   recalculate() {
     if (this.props.direction == LayoutDirection.Row) {
-      const convertedChildren = [...this.children];
-      convertedChildren.forEach((child) => {
+      this.children.forEach((child) => {
         if (child.width instanceof PercentageSize) {
           child.width = child.width.asUnitSize(this.width);
         }
       });
 
-      let widthSum = 0;
-      convertedChildren.forEach((child) => {
-        if (child.width instanceof UnitSize) {
-          widthSum += child.width.value;
-        }
-      });
+      const widthUnits = this.children
+        .filter((c) => c.width instanceof UnitSize)
+        .map((c) => c.width);
+      const totalWidthUnits = this.getTotalUnits(widthUnits);
+      const remainingSpace = this.width - totalWidthUnits;
 
-      const widthLeft = this.width - widthSum;
+      const widthFractions = this.children
+        .filter((c) => c.width instanceof FractionSize)
+        .map((c) => c.width as FractionSize);
+      const totalWidthFractions = this.getTotalFractions(widthFractions);
 
-      let fractionsSum = 0;
-      convertedChildren.forEach((child) => {
+      this.children.forEach((child) => {
         if (child.width instanceof FractionSize) {
-          fractionsSum += child.width.value;
-        }
-      });
-
-      convertedChildren.forEach((child) => {
-        if (child.width instanceof FractionSize) {
-          child.width = child.width.asUnitSize(widthLeft, fractionsSum);
+          child.width = child.width.asUnitSize(
+            remainingSpace,
+            totalWidthFractions
+          );
         }
       });
 
@@ -70,17 +68,25 @@ class AutoLayout {
         child.group.scale.setX(child.width.value);
         startPositionX += child.width.value / 2;
       });
-    } else {
+    } else if (this.props.direction == LayoutDirection.Column) {
     }
+  }
+
+  private getTotalFractions(sizes: FractionSize[]): number {
+    let fractionsSum = 0;
+    sizes.forEach((size) => {
+      fractionsSum += size.value;
+    });
+    return fractionsSum;
+  }
+
+  private getTotalUnits(sizes: UnitSize[]): number {
+    let totalUnits = 0;
+    sizes.forEach((size) => {
+      totalUnits += size.value;
+    });
+    return totalUnits;
   }
 }
 
-export {
-  AutoLayout,
-  LayoutDirection,
-  SizeType,
-  type LayoutElement,
-  type ElementSize,
-};
-
-export { type PercentageSize, type UnitSize, type FractionSize };
+export { AutoLayout, LayoutDirection, type LayoutElement };

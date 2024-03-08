@@ -10,9 +10,12 @@ import {
 import { ElementSize, Size } from "./layouts/Sizes";
 
 const gui = new GUI();
-let properties = { width: 10 };
-gui.add(properties, "width", 1, 100, 1).onChange((value): any => {
-  redrawLayout(value);
+let properties = { width: 10, height: 10 };
+gui.add(properties, "width", 1, 100, 1).onChange((value: number) => {
+  redrawLayout(value, properties.height);
+});
+gui.add(properties, "height", 1, 100, 1).onChange((value: number) => {
+  redrawLayout(properties.width, value);
 });
 
 const scene = new THREE.Scene();
@@ -30,7 +33,7 @@ controls.listenToKeyEvents(window);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-redrawLayout(properties.width);
+redrawLayout(properties.width, properties.height);
 
 camera.position.z = 5;
 
@@ -57,7 +60,7 @@ function createLayoutElement(
   };
 }
 
-function redrawLayout(width: number) {
+function redrawLayout(width: number, height: number) {
   cubesContainer.clear();
 
   const cubes = [
@@ -72,7 +75,7 @@ function redrawLayout(width: number) {
   const cubesLayout = new AutoLayout(
     { direction: LayoutDirection.Row },
     width,
-    1,
+    height,
     cubes
   );
 
