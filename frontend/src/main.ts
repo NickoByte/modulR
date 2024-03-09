@@ -6,6 +6,7 @@ import {
   AutoLayout,
   LayoutElement,
   LayoutDirection,
+  JustifyElements,
 } from "./layouts/AutoLayout";
 import { ElementSize, Size } from "./layouts/Sizes";
 
@@ -63,7 +64,7 @@ function createLayoutElement(
 function redrawLayout(width: number, height: number) {
   cubesContainer.clear();
 
-  const cubes = [
+  const differentUnitsElements = [
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
     createLayoutElement(Size.Unit(2), Size.Unit(1), 0x00ff00),
     createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0x0000ff),
@@ -72,18 +73,41 @@ function redrawLayout(width: number, height: number) {
     createLayoutElement(Size.Percentage(10), Size.Percentage(10), 0x0000ff),
   ];
 
-  const cubesLayout = new AutoLayout(
+  const differentUnitsLayout = new AutoLayout(
     { direction: LayoutDirection.Row },
     width,
     height,
-    cubes
+    differentUnitsElements
   );
 
-  cubes.forEach((cube) => {
+  differentUnitsLayout.recalculate();
+
+  differentUnitsElements.forEach((cube) => {
+    cubesContainer.add(cube.group);
+  });
+
+  const justifyContentElements = [
+    createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+    createLayoutElement(Size.Unit(1), Size.Unit(1), 0x00ff00),
+    createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+  ];
+
+  const justifyContentLayout = new AutoLayout(
+    {
+      direction: LayoutDirection.Row,
+      justifyElements: JustifyElements.SpaceEvenly,
+    },
+    width,
+    height,
+    justifyContentElements
+  );
+
+  justifyContentLayout.recalculate();
+
+  justifyContentElements.forEach((cube) => {
+    cube.group.position.setY(3);
     cubesContainer.add(cube.group);
   });
 
   scene.add(cubesContainer);
-
-  cubesLayout.recalculate();
 }

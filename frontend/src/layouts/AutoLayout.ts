@@ -6,6 +6,15 @@ enum LayoutDirection {
   Row,
 }
 
+enum JustifyElements {
+  Start,
+  End,
+  Center,
+  SpaceBetween,
+  SpaceAround,
+  SpaceEvenly,
+}
+
 type LayoutPadding = {
   top?: number;
   bottom?: number;
@@ -17,6 +26,7 @@ type LayoutProps = {
   direction?: LayoutDirection;
   gap?: number;
   padding?: LayoutPadding;
+  justifyElements?: JustifyElements;
 };
 
 type LayoutElement = {
@@ -61,6 +71,8 @@ class AutoLayout {
         }
       });
 
+      if (totalWidthFractions === 0) {
+      }
       let startPositionX = 0;
       this.children.forEach((child) => {
         startPositionX += child.width.value / 2;
@@ -89,4 +101,4 @@ class AutoLayout {
   }
 }
 
-export { AutoLayout, LayoutDirection, type LayoutElement };
+export { AutoLayout, LayoutDirection, JustifyElements, type LayoutElement };
