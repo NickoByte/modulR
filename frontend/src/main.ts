@@ -95,7 +95,7 @@ function redrawLayout(width: number, height: number) {
   const justifyContentLayout = new AutoLayout(
     {
       direction: LayoutDirection.Row,
-      justifyElements: JustifyElements.SpaceEvenly,
+      justifyElements: JustifyElements.SpaceAround,
     },
     width,
     height,

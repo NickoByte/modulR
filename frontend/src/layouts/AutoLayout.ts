@@ -71,14 +71,34 @@ class AutoLayout {
         }
       });
 
-      if (totalWidthFractions === 0) {
-      }
       let startPositionX = 0;
+      let gapBetweenElements = 0;
+      if (totalWidthFractions === 0) {
+        switch (this.props.justifyElements) {
+          case JustifyElements.Center:
+            startPositionX = remainingSpace / 2;
+            break;
+          case JustifyElements.End:
+            startPositionX = remainingSpace;
+            break;
+          case JustifyElements.SpaceEvenly:
+            startPositionX = remainingSpace / (this.children.length + 1);
+            gapBetweenElements = remainingSpace / (this.children.length + 1);
+            break;
+          case JustifyElements.SpaceBetween:
+            gapBetweenElements = remainingSpace / (this.children.length - 1);
+            break;
+          case JustifyElements.SpaceAround:
+            const gap = remainingSpace / (this.children.length * 2);
+            startPositionX = gap;
+            gapBetweenElements = gap * 2;
+        }
+      }
       this.children.forEach((child) => {
         startPositionX += child.width.value / 2;
         child.group.position.setX(startPositionX);
         child.group.scale.setX(child.width.value);
-        startPositionX += child.width.value / 2;
+        startPositionX += child.width.value / 2 + gapBetweenElements;
       });
     } else if (this.props.direction == LayoutDirection.Column) {
     }
