@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { ElementSize, FractionSize, PercentageSize, UnitSize } from "./Sizes";
+import { ElementSize, FractionSize, PercentageSize, Size, UnitSize } from "./Sizes";
 
 enum LayoutDirection {
   Column,
@@ -15,6 +15,13 @@ enum JustifyElements {
   SpaceEvenly,
 }
 
+enum AlignElements {
+  Start,
+  End,
+  Center,
+  Stretch,
+}
+
 type LayoutPadding = {
   top?: number;
   bottom?: number;
@@ -27,6 +34,7 @@ type LayoutProps = {
   gap?: number;
   padding?: LayoutPadding;
   justifyElements?: JustifyElements;
+  alignElements?: AlignElements;
 };
 
 type LayoutElement = {
@@ -41,67 +49,141 @@ class AutoLayout {
     private width: number,
     private height: number,
     private children: LayoutElement[]
-  ) {}
+  ) { }
 
   recalculate() {
+    let getElementWidth = (element: LayoutElement): ElementSize => element.width;
+    let getElementHeight = (element: LayoutElement): ElementSize => element.height;
+    let setElementWidth = (element: LayoutElement, size: ElementSize): void => { element.width = size; }
+    let setElementHeight = (element: LayoutElement, size: ElementSize): void => { element.height = size; }
+
+    let mainAxisSize: number;
+    let crossAxisSize: number;
+    let getMainSize = getElementWidth;
+    let getCrossSize = getElementHeight;
+    let setMainSize = setElementWidth;
+    let setCrossSize = setElementHeight;
+
     if (this.props.direction == LayoutDirection.Row) {
-      this.children.forEach((child) => {
-        if (child.width instanceof PercentageSize) {
-          child.width = child.width.asUnitSize(this.width);
+      mainAxisSize = this.width;
+      crossAxisSize = this.height;
+      getMainSize = getElementWidth;
+      getCrossSize = getElementHeight;
+      setMainSize = setElementWidth;
+      setCrossSize = setElementHeight;
+    } else {
+      mainAxisSize = this.height;
+      crossAxisSize = this.width;
+      getMainSize = getElementHeight;
+      getCrossSize = getElementWidth;
+      setMainSize = setElementHeight;
+      setCrossSize = setElementWidth;
+    }
+
+    this.children.forEach((child) => {
+      let size = getMainSize(child);
+      if (size instanceof PercentageSize) {
+        setMainSize(child, size.asUnitSize(mainAxisSize));
+        setCrossSize(child, size.asUnitSize(crossAxisSize));
+      }
+    });
+
+    const unitSizes = this.children
+      .filter((c) => getMainSize(c) instanceof UnitSize)
+      .map((c) => getMainSize(c) as UnitSize);
+    const totalUnits = this.getTotalUnits(unitSizes);
+    const remainingSpace = mainAxisSize - totalUnits;
+
+    const fractionSizes = this.children
+      .filter((c) => getMainSize(c) instanceof FractionSize)
+      .map((c) => getMainSize(c) as FractionSize);
+    const totalFractions = this.getTotalFractions(fractionSizes);
+
+    this.children.forEach((child) => {
+      let size = getMainSize(child);
+      if (size instanceof FractionSize) {
+        setMainSize(child, size.asUnitSize(
+          remainingSpace,
+          totalFractions
+        ));
+        setCrossSize(child, Size.Unit(crossAxisSize));
+      }
+    });
+
+    let startPosition = 0;
+    let gapBetweenElements = 0;
+    if (totalFractions === 0) {
+      switch (this.props.justifyElements) {
+        case JustifyElements.Center:
+          startPosition = remainingSpace / 2;
+          break;
+        case JustifyElements.End:
+          startPosition = remainingSpace;
+          break;
+        case JustifyElements.SpaceEvenly:
+          startPosition = remainingSpace / (this.children.length + 1);
+          gapBetweenElements = remainingSpace / (this.children.length + 1);
+          break;
+        case JustifyElements.SpaceBetween:
+          gapBetweenElements = remainingSpace / (this.children.length - 1);
+          break;
+        case JustifyElements.SpaceAround:
+          const gap = remainingSpace / (this.children.length * 2);
+          startPosition = gap;
+          gapBetweenElements = gap * 2;
+      }
+    }
+
+    this.children.forEach((child) => {
+      startPosition += getMainSize(child).value / 2;
+
+      if (this.props.direction === LayoutDirection.Row) {
+        child.group.position.setX(startPosition);
+        child.group.scale.setX(getMainSize(child).value);
+        child.group.scale.setY(getCrossSize(child).value);
+      } else {
+        child.group.position.setY(startPosition);
+        child.group.scale.setX(getCrossSize(child).value);
+        child.group.scale.setY(getMainSize(child).value);
+      }
+      startPosition += getMainSize(child).value / 2 + gapBetweenElements;
+    });
+
+    this.children.forEach((child) => {
+      if (this.props.direction == LayoutDirection.Row) {
+        switch (this.props.alignElements) {
+          case AlignElements.Start:
+            child.group.position.setY(child.height.value / 2);
+            break;
+          case AlignElements.End:
+            child.group.position.setY(this.height - (child.height.value / 2));
+            break;
+          case AlignElements.Center:
+            child.group.position.setY((this.height / 2));
+            break;
+          case AlignElements.Stretch:
+            child.group.position.setY((this.height / 2));
+            child.group.scale.setY(this.height);
+            break;
         }
-      });
-
-      const widthUnits = this.children
-        .filter((c) => c.width instanceof UnitSize)
-        .map((c) => c.width);
-      const totalWidthUnits = this.getTotalUnits(widthUnits);
-      const remainingSpace = this.width - totalWidthUnits;
-
-      const widthFractions = this.children
-        .filter((c) => c.width instanceof FractionSize)
-        .map((c) => c.width as FractionSize);
-      const totalWidthFractions = this.getTotalFractions(widthFractions);
-
-      this.children.forEach((child) => {
-        if (child.width instanceof FractionSize) {
-          child.width = child.width.asUnitSize(
-            remainingSpace,
-            totalWidthFractions
-          );
-        }
-      });
-
-      let startPositionX = 0;
-      let gapBetweenElements = 0;
-      if (totalWidthFractions === 0) {
-        switch (this.props.justifyElements) {
-          case JustifyElements.Center:
-            startPositionX = remainingSpace / 2;
+      } else {
+        switch (this.props.alignElements) {
+          case AlignElements.Start:
+            child.group.position.setX(child.width.value / 2);
             break;
-          case JustifyElements.End:
-            startPositionX = remainingSpace;
+          case AlignElements.End:
+            child.group.position.setX(this.width - (child.width.value / 2));
             break;
-          case JustifyElements.SpaceEvenly:
-            startPositionX = remainingSpace / (this.children.length + 1);
-            gapBetweenElements = remainingSpace / (this.children.length + 1);
+          case AlignElements.Center:
+            child.group.position.setX((this.width / 2));
             break;
-          case JustifyElements.SpaceBetween:
-            gapBetweenElements = remainingSpace / (this.children.length - 1);
+          case AlignElements.Stretch:
+            child.group.position.setX((this.width / 2));
+            child.group.scale.setX(this.width);
             break;
-          case JustifyElements.SpaceAround:
-            const gap = remainingSpace / (this.children.length * 2);
-            startPositionX = gap;
-            gapBetweenElements = gap * 2;
         }
       }
-      this.children.forEach((child) => {
-        startPositionX += child.width.value / 2;
-        child.group.position.setX(startPositionX);
-        child.group.scale.setX(child.width.value);
-        startPositionX += child.width.value / 2 + gapBetweenElements;
-      });
-    } else if (this.props.direction == LayoutDirection.Column) {
-    }
+    })
   }
 
   private getTotalFractions(sizes: FractionSize[]): number {
@@ -121,4 +203,4 @@ class AutoLayout {
   }
 }
 
-export { AutoLayout, LayoutDirection, JustifyElements, type LayoutElement };
+export { AutoLayout, LayoutDirection, JustifyElements, AlignElements, type LayoutElement };
