@@ -1,4 +1,5 @@
 # modulR
+
 <div align="center">
   <img src="https://github.com/NickoByte/modulR/assets/144497980/751fc14a-b36e-4a32-aebf-c604ea0cf5a6" alt="Logo" width="384" height="303">
 </div>
@@ -10,7 +11,10 @@ A web app created to make furniture designers' life easier. The main purpose of 
 ---
 
 ## Roadmap
+
 - [ ] Define flex and grid like layouts
 - [ ] Allow user to create predefined components
+- [ ] Prepare project demo
 - [ ] Introduce texturing tool
 - [ ] Define object materials
+- [ ] Create materials library
