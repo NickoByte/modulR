@@ -56,22 +56,17 @@ function createLayoutElement(
   const geometry = new THREE.BoxGeometry(1, 1, 0.1);
   const material = new THREE.MeshBasicMaterial({ color: color });
   const cube = new THREE.Mesh(geometry, material);
-  return {
-    width: sizeX,
-    height: sizeY,
-    sceneObject: cube,
-  };
+  return new LayoutElement(sizeX, sizeY, cube);
 }
 
 function createAutoLayout(
   sizeX: ElementSize,
   sizeY: ElementSize,
-  color: THREE.ColorRepresentation = 0xffffff,
   props: LayoutProps,
   children: LayoutElement[]
 ): AutoLayout {
-  const geometry = new THREE.BoxGeometry(1, 1, 0.1);
-  const material = new THREE.MeshBasicMaterial({ color: color });
+  const geometry = new THREE.BoxGeometry(1, 1, 0.5);
+  const material = new THREE.MeshBasicMaterial({ color: 0xfff000 });
   const cube = new THREE.Mesh(geometry, material);
   children.forEach(child => {
     cube.add(child.sceneObject);
@@ -108,28 +103,26 @@ function redrawLayout(width: number, height: number) {
     differentUnitsElements
   );
 
-  differentUnitsLayout.recalculate();
+  // differentUnitsLayout.recalculate();
 
   // differentUnitsElements.forEach((cube) => {
   //   cubesContainer.add(cube.sceneObject);
   // });
 
   const justifyContentElements = [
-    createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
-    createAutoLayout(Size.Fraction(1), Size.Fraction(1), 0xff00ff,
+    createLayoutElement(Size.Unit(4), Size.Unit(1), 0xff0000),
+    createAutoLayout(Size.Fraction(1), Size.Fraction(1),
       {
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Stretch
       },
       [
-        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+        createLayoutElement(Size.Unit(2), Size.Unit(2), 0xff0000),
         createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0xffffff),
         createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000)
       ]),
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
   ];
-
-  console.log(justifyContentElements);
 
   const justifyContentLayout = new AutoLayout(
     Size.Unit(width),
@@ -145,11 +138,11 @@ function redrawLayout(width: number, height: number) {
 
   justifyContentLayout.recalculate();
 
-  justifyContentElements.forEach((cube) => {
-    cubesContainer.add(cube.sceneObject);
+  justifyContentElements.forEach((element) => {
+    cubesContainer.add(element.sceneObject);
   });
 
-  console.log(cubesContainer);
+  console.log(justifyContentElements);
 
   scene.add(cubesContainer);
 }

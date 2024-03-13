@@ -6,8 +6,6 @@ enum LayoutDirection {
   Row,
 }
 
-
-
 enum JustifyElements {
   Start,
   End,
@@ -214,11 +212,17 @@ class AutoLayout extends LayoutElement {
       }
     })
 
+    console.log(this.children);
+
     this.children.forEach(child => {
+      if (child.sceneObject.parent) {
+        child.sceneObject.position.sub(child.sceneObject.parent.position);
+      }
       if (child instanceof AutoLayout) {
         child.recalculate();
       }
     });
+
   }
 
   private getTotalFractions(sizes: FractionSize[]): number {
@@ -238,4 +242,4 @@ class AutoLayout extends LayoutElement {
   }
 }
 
-export { AutoLayout, LayoutDirection, JustifyElements, AlignElements, type LayoutElement, type LayoutProps };
+export { AutoLayout, LayoutDirection, JustifyElements, AlignElements, LayoutElement, type LayoutProps };
