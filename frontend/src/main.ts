@@ -8,6 +8,7 @@ import {
   LayoutDirection,
   JustifyElements,
   AlignElements,
+  LayoutProps,
 } from "./layouts/AutoLayout";
 import { ElementSize, Size } from "./layouts/Sizes";
 
@@ -58,8 +59,24 @@ function createLayoutElement(
   return {
     width: sizeX,
     height: sizeY,
-    group: new THREE.Group().add(cube),
+    sceneObject: cube,
   };
+}
+
+function createAutoLayout(
+  sizeX: ElementSize,
+  sizeY: ElementSize,
+  color: THREE.ColorRepresentation = 0xffffff,
+  props: LayoutProps,
+  children: LayoutElement[]
+): AutoLayout {
+  const geometry = new THREE.BoxGeometry(1, 1, 0.1);
+  const material = new THREE.MeshBasicMaterial({ color: color });
+  const cube = new THREE.Mesh(geometry, material);
+  children.forEach(child => {
+    cube.add(child.sceneObject);
+  });
+  return new AutoLayout(sizeX, sizeY, cube, props, children);
 }
 
 function redrawLayout(width: number, height: number) {
@@ -81,44 +98,58 @@ function redrawLayout(width: number, height: number) {
   ];
 
   const differentUnitsLayout = new AutoLayout(
+    Size.Unit(width),
+    Size.Unit(height),
+    new THREE.Group(),
     {
       direction: LayoutDirection.Column,
       alignElements: AlignElements.End
     },
-    width,
-    height,
     differentUnitsElements
   );
 
   differentUnitsLayout.recalculate();
 
-  differentUnitsElements.forEach((cube) => {
-    cubesContainer.add(cube.group);
-  });
+  // differentUnitsElements.forEach((cube) => {
+  //   cubesContainer.add(cube.sceneObject);
+  // });
 
   const justifyContentElements = [
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
-    createLayoutElement(Size.Unit(1), Size.Unit(1), 0x00ff00),
+    createAutoLayout(Size.Fraction(1), Size.Fraction(1), 0xff00ff,
+      {
+        direction: LayoutDirection.Column,
+        alignElements: AlignElements.Stretch
+      },
+      [
+        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+        createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0xffffff),
+        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000)
+      ]),
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
   ];
 
+  console.log(justifyContentElements);
+
   const justifyContentLayout = new AutoLayout(
+    Size.Unit(width),
+    Size.Unit(height),
+    new THREE.Group(),
     {
-      direction: LayoutDirection.Column,
+      direction: LayoutDirection.Row,
       alignElements: AlignElements.Stretch,
       justifyElements: JustifyElements.SpaceEvenly,
     },
-    width,
-    height,
     justifyContentElements
   );
 
   justifyContentLayout.recalculate();
 
   justifyContentElements.forEach((cube) => {
-    cube.group.position.add(new THREE.Vector3(width, 0, 0));
-    cubesContainer.add(cube.group);
+    cubesContainer.add(cube.sceneObject);
   });
+
+  console.log(cubesContainer);
 
   scene.add(cubesContainer);
 }

@@ -6,6 +6,8 @@ enum LayoutDirection {
   Row,
 }
 
+
+
 enum JustifyElements {
   Start,
   End,
@@ -37,19 +39,25 @@ type LayoutProps = {
   alignElements?: AlignElements;
 };
 
-type LayoutElement = {
-  width: ElementSize;
-  height: ElementSize;
-  group: THREE.Group;
+class LayoutElement {
+  constructor(
+    public width: ElementSize,
+    public height: ElementSize,
+    public sceneObject: THREE.Object3D) {
+  }
 };
 
-class AutoLayout {
+
+class AutoLayout extends LayoutElement {
   constructor(
+    width: ElementSize,
+    height: ElementSize,
+    sceneObject: THREE.Object3D,
     private props: LayoutProps,
-    private width: number,
-    private height: number,
-    private children: LayoutElement[]
-  ) { }
+    public children: LayoutElement[],
+  ) {
+    super(width, height, sceneObject);
+  }
 
   recalculate() {
     let getElementWidth = (element: LayoutElement): ElementSize => element.width;
@@ -65,15 +73,15 @@ class AutoLayout {
     let setCrossSize = setElementHeight;
 
     if (this.props.direction == LayoutDirection.Row) {
-      mainAxisSize = this.width;
-      crossAxisSize = this.height;
+      mainAxisSize = this.width.value;
+      crossAxisSize = this.height.value;
       getMainSize = getElementWidth;
       getCrossSize = getElementHeight;
       setMainSize = setElementWidth;
       setCrossSize = setElementHeight;
     } else {
-      mainAxisSize = this.height;
-      crossAxisSize = this.width;
+      mainAxisSize = this.height.value;
+      crossAxisSize = this.width.value;
       getMainSize = getElementHeight;
       getCrossSize = getElementWidth;
       setMainSize = setElementHeight;
@@ -136,15 +144,24 @@ class AutoLayout {
 
     this.children.forEach((child) => {
       startPosition += getMainSize(child).value / 2;
+      let cube = child.sceneObject instanceof THREE.Mesh ? child.sceneObject as THREE.Mesh : undefined;
 
       if (this.props.direction === LayoutDirection.Row) {
-        child.group.position.setX(startPosition);
-        child.group.scale.setX(getMainSize(child).value);
-        child.group.scale.setY(getCrossSize(child).value);
+        child.sceneObject.position.setX(startPosition);
+
+        if (cube) {
+          const newGeometry = new THREE.BoxGeometry(getMainSize(child).value, getCrossSize(child).value, 0.1, 1, 1, 1);
+          cube.geometry.dispose();
+          cube.geometry = newGeometry;
+        }
       } else {
-        child.group.position.setY(startPosition);
-        child.group.scale.setX(getCrossSize(child).value);
-        child.group.scale.setY(getMainSize(child).value);
+        child.sceneObject.position.setY(startPosition);
+
+        if (cube) {
+          const newGeometry = new THREE.BoxGeometry(getCrossSize(child).value, getMainSize(child).value, 0.1, 1, 1, 1);
+          cube.geometry.dispose();
+          cube.geometry = newGeometry;
+        }
       }
       startPosition += getMainSize(child).value / 2 + gapBetweenElements;
     });
@@ -153,37 +170,55 @@ class AutoLayout {
       if (this.props.direction == LayoutDirection.Row) {
         switch (this.props.alignElements) {
           case AlignElements.Start:
-            child.group.position.setY(child.height.value / 2);
+            child.sceneObject.position.setY(child.height.value / 2);
             break;
           case AlignElements.End:
-            child.group.position.setY(this.height - (child.height.value / 2));
+            child.sceneObject.position.setY(this.height.value - (child.height.value / 2));
             break;
           case AlignElements.Center:
-            child.group.position.setY((this.height / 2));
+            child.sceneObject.position.setY((this.height.value / 2));
             break;
           case AlignElements.Stretch:
-            child.group.position.setY((this.height / 2));
-            child.group.scale.setY(this.height);
+            child.sceneObject.position.setY((this.height.value / 2));
+
+            let cube = child.sceneObject instanceof THREE.Mesh ? child.sceneObject as THREE.Mesh : undefined;
+            if (cube) {
+              const newGeometry = new THREE.BoxGeometry(child.width.value, this.height.value, 0.1, 1, 1, 1);
+              cube.geometry.dispose();
+              cube.geometry = newGeometry;
+            }
             break;
         }
       } else {
         switch (this.props.alignElements) {
           case AlignElements.Start:
-            child.group.position.setX(child.width.value / 2);
+            child.sceneObject.position.setX(child.width.value / 2);
             break;
           case AlignElements.End:
-            child.group.position.setX(this.width - (child.width.value / 2));
+            child.sceneObject.position.setX(this.width.value - (child.width.value / 2));
             break;
           case AlignElements.Center:
-            child.group.position.setX((this.width / 2));
+            child.sceneObject.position.setX((this.width.value / 2));
             break;
           case AlignElements.Stretch:
-            child.group.position.setX((this.width / 2));
-            child.group.scale.setX(this.width);
+            child.sceneObject.position.setX((this.width.value / 2));
+
+            let cube = child.sceneObject instanceof THREE.Mesh ? child.sceneObject as THREE.Mesh : undefined;
+            if (cube) {
+              const newGeometry = new THREE.BoxGeometry(this.width.value, child.height.value, 0.1, 1, 1, 1);
+              cube.geometry.dispose();
+              cube.geometry = newGeometry;
+            }
             break;
         }
       }
     })
+
+    this.children.forEach(child => {
+      if (child instanceof AutoLayout) {
+        child.recalculate();
+      }
+    });
   }
 
   private getTotalFractions(sizes: FractionSize[]): number {
@@ -203,4 +238,4 @@ class AutoLayout {
   }
 }
 
-export { AutoLayout, LayoutDirection, JustifyElements, AlignElements, type LayoutElement };
+export { AutoLayout, LayoutDirection, JustifyElements, AlignElements, type LayoutElement, type LayoutProps };
