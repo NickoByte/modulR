@@ -7,6 +7,7 @@ import {
   LayoutElement,
   LayoutDirection,
   JustifyElements,
+  AlignElements,
 } from "./layouts/AutoLayout";
 import { ElementSize, Size } from "./layouts/Sizes";
 
@@ -64,17 +65,26 @@ function createLayoutElement(
 function redrawLayout(width: number, height: number) {
   cubesContainer.clear();
 
+  const helperGeometry = new THREE.BoxGeometry(width, height, 0.1, 1, 1, 1);
+  const helperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.1, transparent: true });
+  const helperBox = new THREE.Mesh(helperGeometry, helperMaterial);
+  helperBox.position.set(width / 2, height / 2, 0);
+  cubesContainer.add(helperBox);
+
   const differentUnitsElements = [
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
-    createLayoutElement(Size.Unit(2), Size.Unit(1), 0x00ff00),
+    createLayoutElement(Size.Unit(2), Size.Unit(2), 0x00ff00),
     createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0x0000ff),
-    createLayoutElement(Size.Fraction(2), Size.Fraction(2), 0xff0000),
-    createLayoutElement(Size.Percentage(10), Size.Percentage(10), 0x00ff00),
-    createLayoutElement(Size.Percentage(10), Size.Percentage(10), 0x0000ff),
+    createLayoutElement(Size.Fraction(2), Size.Fraction(1), 0xff0000),
+    createLayoutElement(Size.Percentage(10), Size.Percentage(30), 0x00ff00),
+    createLayoutElement(Size.Percentage(10), Size.Percentage(20), 0x0000ff),
   ];
 
   const differentUnitsLayout = new AutoLayout(
-    { direction: LayoutDirection.Row },
+    {
+      direction: LayoutDirection.Column,
+      alignElements: AlignElements.End
+    },
     width,
     height,
     differentUnitsElements
@@ -94,8 +104,9 @@ function redrawLayout(width: number, height: number) {
 
   const justifyContentLayout = new AutoLayout(
     {
-      direction: LayoutDirection.Row,
-      justifyElements: JustifyElements.SpaceAround,
+      direction: LayoutDirection.Column,
+      alignElements: AlignElements.Stretch,
+      justifyElements: JustifyElements.SpaceEvenly,
     },
     width,
     height,
@@ -105,7 +116,7 @@ function redrawLayout(width: number, height: number) {
   justifyContentLayout.recalculate();
 
   justifyContentElements.forEach((cube) => {
-    cube.group.position.setY(3);
+    cube.group.position.add(new THREE.Vector3(width, 0, 0));
     cubesContainer.add(cube.group);
   });
 
