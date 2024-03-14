@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { FractionSize, PercentageSize } from "./Sizes";
+import { FractionSize, PercentageSize } from "../Sizes";
 
 const percentageCases = [
   [20, 10, 2],

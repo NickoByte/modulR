@@ -8,8 +8,8 @@ import {
 } from "./Sizes";
 
 enum LayoutDirection {
-  Column,
-  Row,
+  Column = "Column",
+  Row = "Row",
 }
 
 enum JustifyElements {
@@ -22,10 +22,10 @@ enum JustifyElements {
 }
 
 enum AlignElements {
-  Start,
-  End,
-  Center,
-  Stretch,
+  Start = "Start",
+  End = "End",
+  Center = "Center",
+  Stretch = "Stretch",
 }
 
 type LayoutPadding = {
@@ -44,11 +44,19 @@ type LayoutProps = {
 };
 
 class LayoutElement {
+  public position: THREE.Vector3;
+
   constructor(
     public width: ElementSize,
     public height: ElementSize,
-    public sceneObject: THREE.Object3D
-  ) {}
+    public sceneObject: THREE.Object3D,
+    position?: THREE.Vector3
+  ) {
+    this.width = width;
+    this.height = height;
+    this.position = position ?? new THREE.Vector3();
+    this.sceneObject = sceneObject;
+  }
 }
 
 class AutoLayout extends LayoutElement {
@@ -57,9 +65,10 @@ class AutoLayout extends LayoutElement {
     height: ElementSize,
     sceneObject: THREE.Object3D,
     private props: LayoutProps,
-    public children: LayoutElement[]
+    public children: LayoutElement[],
+    position?: THREE.Vector3
   ) {
-    super(width, height, sceneObject);
+    super(width, height, sceneObject, position);
   }
 
   recalculate() {
@@ -159,6 +168,7 @@ class AutoLayout extends LayoutElement {
           : undefined;
 
       if (this.props.direction === LayoutDirection.Row) {
+        child.position.setX(startPosition);
         child.sceneObject.position.setX(startPosition);
 
         if (cube) {
@@ -174,6 +184,7 @@ class AutoLayout extends LayoutElement {
           cube.geometry = newGeometry;
         }
       } else {
+        child.position.setY(startPosition);
         child.sceneObject.position.setY(startPosition);
 
         if (cube) {
@@ -196,18 +207,22 @@ class AutoLayout extends LayoutElement {
       if (this.props.direction == LayoutDirection.Row) {
         switch (this.props.alignElements) {
           case AlignElements.Start:
+            child.position.setY(child.height.value / 2);
             child.sceneObject.position.setY(child.height.value / 2);
             break;
           case AlignElements.End:
+            child.position.setY(this.height.value - child.height.value / 2);
             child.sceneObject.position.setY(
               this.height.value - child.height.value / 2
             );
             break;
           case AlignElements.Center:
+            child.position.setY(this.height.value / 2);
             child.sceneObject.position.setY(this.height.value / 2);
             break;
           case AlignElements.Stretch:
             child.height = Size.Unit(10);
+            child.position.setY(this.height.value / 2);
             child.sceneObject.position.setY(this.height.value / 2);
 
             let cube =
@@ -231,18 +246,22 @@ class AutoLayout extends LayoutElement {
       } else {
         switch (this.props.alignElements) {
           case AlignElements.Start:
+            child.position.setX(child.width.value / 2);
             child.sceneObject.position.setX(child.width.value / 2);
             break;
           case AlignElements.End:
+            child.position.setX(this.width.value - child.width.value / 2);
             child.sceneObject.position.setX(
               this.width.value - child.width.value / 2
             );
             break;
           case AlignElements.Center:
+            child.position.setX(this.width.value / 2);
             child.sceneObject.position.setX(this.width.value / 2);
             break;
           case AlignElements.Stretch:
             child.width = Size.Unit(10);
+            child.position.setX(this.width.value / 2);
             child.sceneObject.position.setX(this.width.value / 2);
 
             let cube =

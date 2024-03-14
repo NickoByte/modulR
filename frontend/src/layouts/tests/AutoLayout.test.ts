@@ -3,8 +3,8 @@ import {
   AutoLayout,
   LayoutDirection,
   LayoutElement,
-} from "./AutoLayout";
-import { Size } from "./Sizes";
+} from "../AutoLayout";
+import { Size } from "../Sizes";
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 
@@ -68,5 +68,69 @@ describe("AutoLayout", () => {
     const child = rootLayout.children[0];
     expect(child.height.value).toBe(10);
     expect(child.width.value).toBe(10);
+  });
+
+  it("children's dimensions converted to units when percentage given", () => {
+    const rootLayout = new AutoLayout(
+      Size.Unit(10),
+      Size.Unit(10),
+      new THREE.Group(),
+      {
+        direction: LayoutDirection.Column,
+        alignElements: AlignElements.Center,
+      },
+      [
+        new LayoutElement(
+          Size.Percentage(50),
+          Size.Percentage(50),
+          new THREE.Object3D()
+        ),
+      ]
+    );
+
+    rootLayout.recalculate();
+
+    const child = rootLayout.children[0];
+    expect(child.height.value).toBe(5);
+    expect(child.width.value).toBe(5);
+  });
+
+  it("different size types converted properly to unit size when layout calculated", () => {
+    const rootLayout = new AutoLayout(
+      Size.Unit(10),
+      Size.Unit(10),
+      new THREE.Group(),
+      {
+        direction: LayoutDirection.Column,
+        alignElements: AlignElements.Center,
+      },
+      [
+        new LayoutElement(
+          Size.Percentage(50),
+          Size.Percentage(50),
+          new THREE.Object3D()
+        ),
+        new LayoutElement(Size.Unit(1), Size.Unit(1), new THREE.Object3D()),
+        new LayoutElement(
+          Size.Fraction(1),
+          Size.Fraction(1),
+          new THREE.Object3D()
+        ),
+      ]
+    );
+
+    rootLayout.recalculate();
+
+    const firstChild = rootLayout.children[0];
+    expect(firstChild.height.value).toBe(5);
+    expect(firstChild.width.value).toBe(5);
+
+    const secondChild = rootLayout.children[1];
+    expect(secondChild.height.value).toBe(1);
+    expect(secondChild.width.value).toBe(1);
+
+    const thirdChild = rootLayout.children[2];
+    expect(thirdChild.height.value).toBe(4);
+    expect(thirdChild.width.value).toBe(10);
   });
 });
