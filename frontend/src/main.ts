@@ -68,7 +68,7 @@ function createAutoLayout(
   const geometry = new THREE.BoxGeometry(1, 1, 0.5);
   const material = new THREE.MeshBasicMaterial({ color: 0xfff000 });
   const cube = new THREE.Mesh(geometry, material);
-  children.forEach(child => {
+  children.forEach((child) => {
     cube.add(child.sceneObject);
   });
   return new AutoLayout(sizeX, sizeY, cube, props, children);
@@ -78,7 +78,11 @@ function redrawLayout(width: number, height: number) {
   cubesContainer.clear();
 
   const helperGeometry = new THREE.BoxGeometry(width, height, 0.1, 1, 1, 1);
-  const helperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.1, transparent: true });
+  const helperMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    opacity: 0.1,
+    transparent: true,
+  });
   const helperBox = new THREE.Mesh(helperGeometry, helperMaterial);
   helperBox.position.set(width / 2, height / 2, 0);
   cubesContainer.add(helperBox);
@@ -98,7 +102,7 @@ function redrawLayout(width: number, height: number) {
     new THREE.Group(),
     {
       direction: LayoutDirection.Column,
-      alignElements: AlignElements.End
+      alignElements: AlignElements.End,
     },
     differentUnitsElements
   );
@@ -111,16 +115,19 @@ function redrawLayout(width: number, height: number) {
 
   const justifyContentElements = [
     createLayoutElement(Size.Unit(4), Size.Unit(1), 0xff0000),
-    createAutoLayout(Size.Fraction(1), Size.Fraction(1),
+    createAutoLayout(
+      Size.Fraction(1),
+      Size.Fraction(1),
       {
         direction: LayoutDirection.Column,
-        alignElements: AlignElements.Stretch
+        alignElements: AlignElements.Stretch,
       },
       [
         createLayoutElement(Size.Unit(2), Size.Unit(2), 0xff0000),
         createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0xffffff),
-        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000)
-      ]),
+        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+      ]
+    ),
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
   ];
 
@@ -141,8 +148,6 @@ function redrawLayout(width: number, height: number) {
   justifyContentElements.forEach((element) => {
     cubesContainer.add(element.sceneObject);
   });
-
-  console.log(justifyContentElements);
 
   scene.add(cubesContainer);
 }
