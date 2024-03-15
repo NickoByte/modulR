@@ -67,7 +67,7 @@ function createAutoLayout(
 ): AutoLayout {
   const geometry = new THREE.BoxGeometry(1, 1, 0.5);
   const material = new THREE.MeshBasicMaterial({ color: 0xfff000 });
-  const cube = new THREE.Mesh(geometry, material);
+  const cube = new THREE.Group();
   children.forEach((child) => {
     cube.add(child.sceneObject);
   });
@@ -84,7 +84,6 @@ function redrawLayout(width: number, height: number) {
     transparent: true,
   });
   const helperBox = new THREE.Mesh(helperGeometry, helperMaterial);
-  helperBox.position.set(width / 2, height / 2, 0);
   cubesContainer.add(helperBox);
 
   const differentUnitsElements = [
@@ -123,9 +122,22 @@ function redrawLayout(width: number, height: number) {
         alignElements: AlignElements.Stretch,
       },
       [
-        createLayoutElement(Size.Unit(2), Size.Unit(2), 0xff0000),
-        createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0xffffff),
-        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+        createLayoutElement(Size.Unit(2), Size.Unit(2), 0xcc0000),
+        createAutoLayout(
+          Size.Fraction(1),
+          Size.Fraction(1),
+          {
+            direction: LayoutDirection.Column,
+            alignElements: AlignElements.Stretch,
+            justifyElements: JustifyElements.SpaceAround,
+          },
+          [
+            createLayoutElement(Size.Fraction(1), Size.Unit(1), 0x000fff),
+            createLayoutElement(Size.Fraction(1), Size.Unit(1), 0x000fff),
+            createLayoutElement(Size.Fraction(1), Size.Unit(1), 0x000fff),
+          ]
+        ),
+        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xcc0000),
       ]
     ),
     createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),

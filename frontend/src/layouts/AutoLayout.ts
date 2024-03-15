@@ -13,12 +13,12 @@ enum LayoutDirection {
 }
 
 enum JustifyElements {
-  Start,
-  End,
-  Center,
-  SpaceBetween,
-  SpaceAround,
-  SpaceEvenly,
+  Start = "Start",
+  End = "End",
+  Center = "Center",
+  SpaceBetween = "SpaceBetween",
+  SpaceAround = "SpaceAround",
+  SpaceEvenly = "SpaceEvenly",
 }
 
 enum AlignElements {
@@ -136,18 +136,30 @@ class AutoLayout extends LayoutElement {
       }
     });
 
-    let startPosition = 0;
+    let currentPositionMain =
+      this.props.direction == LayoutDirection.Row
+        ? -this.width.value / 2
+        : this.height.value / 2;
     let gapBetweenElements = 0;
     if (totalFractions === 0) {
       switch (this.props.justifyElements) {
         case JustifyElements.Center:
-          startPosition = remainingSpace / 2;
+          currentPositionMain +=
+            this.props.direction == LayoutDirection.Row
+              ? remainingSpace / 2
+              : -remainingSpace / 2;
           break;
         case JustifyElements.End:
-          startPosition = remainingSpace;
+          currentPositionMain +=
+            this.props.direction == LayoutDirection.Row
+              ? remainingSpace
+              : -remainingSpace;
           break;
         case JustifyElements.SpaceEvenly:
-          startPosition = remainingSpace / (this.children.length + 1);
+          currentPositionMain +=
+            this.props.direction == LayoutDirection.Row
+              ? remainingSpace / (this.children.length + 1)
+              : -(remainingSpace / (this.children.length + 1));
           gapBetweenElements = remainingSpace / (this.children.length + 1);
           break;
         case JustifyElements.SpaceBetween:
@@ -155,140 +167,83 @@ class AutoLayout extends LayoutElement {
           break;
         case JustifyElements.SpaceAround:
           const gap = remainingSpace / (this.children.length * 2);
-          startPosition = gap;
+          currentPositionMain +=
+            this.props.direction == LayoutDirection.Row ? gap : -gap;
           gapBetweenElements = gap * 2;
       }
     }
 
     this.children.forEach((child) => {
-      startPosition += getMainSize(child).value / 2;
-      let cube =
-        child.sceneObject instanceof THREE.Mesh
-          ? (child.sceneObject as THREE.Mesh)
-          : undefined;
-
       if (this.props.direction === LayoutDirection.Row) {
-        child.position.setX(startPosition);
-        child.sceneObject.position.setX(startPosition);
-
-        if (cube) {
-          const newGeometry = new THREE.BoxGeometry(
-            getMainSize(child).value,
-            getCrossSize(child).value,
-            0.1,
-            1,
-            1,
-            1
-          );
-          cube.geometry.dispose();
-          cube.geometry = newGeometry;
-        }
+        currentPositionMain += getMainSize(child).value / 2;
+        child.position.setX(currentPositionMain);
+        currentPositionMain +=
+          getMainSize(child).value / 2 + gapBetweenElements;
       } else {
-        child.position.setY(startPosition);
-        child.sceneObject.position.setY(startPosition);
-
-        if (cube) {
-          const newGeometry = new THREE.BoxGeometry(
-            getCrossSize(child).value,
-            getMainSize(child).value,
-            0.1,
-            1,
-            1,
-            1
-          );
-          cube.geometry.dispose();
-          cube.geometry = newGeometry;
-        }
+        currentPositionMain -= getMainSize(child).value / 2;
+        child.position.setY(currentPositionMain);
+        currentPositionMain -=
+          getMainSize(child).value / 2 + gapBetweenElements;
       }
-      startPosition += getMainSize(child).value / 2 + gapBetweenElements;
     });
 
     this.children.forEach((child) => {
       if (this.props.direction == LayoutDirection.Row) {
         switch (this.props.alignElements) {
           case AlignElements.Start:
-            child.position.setY(child.height.value / 2);
-            child.sceneObject.position.setY(child.height.value / 2);
+            child.position.setY((this.height.value - child.height.value) / 2);
             break;
           case AlignElements.End:
-            child.position.setY(this.height.value - child.height.value / 2);
-            child.sceneObject.position.setY(
-              this.height.value - child.height.value / 2
-            );
+            child.position.setY(-(this.height.value - child.height.value) / 2);
             break;
           case AlignElements.Center:
-            child.position.setY(this.height.value / 2);
-            child.sceneObject.position.setY(this.height.value / 2);
+            child.position.setY(0);
             break;
           case AlignElements.Stretch:
-            child.height = Size.Unit(10);
-            child.position.setY(this.height.value / 2);
-            child.sceneObject.position.setY(this.height.value / 2);
-
-            let cube =
-              child.sceneObject instanceof THREE.Mesh
-                ? (child.sceneObject as THREE.Mesh)
-                : undefined;
-            if (cube) {
-              const newGeometry = new THREE.BoxGeometry(
-                child.width.value,
-                this.height.value,
-                0.1,
-                1,
-                1,
-                1
-              );
-              cube.geometry.dispose();
-              cube.geometry = newGeometry;
-            }
+            child.height = Size.Unit(this.height.value);
+            child.position.setY(0);
             break;
         }
       } else {
         switch (this.props.alignElements) {
           case AlignElements.Start:
-            child.position.setX(child.width.value / 2);
-            child.sceneObject.position.setX(child.width.value / 2);
+            child.position.setX(-(this.width.value - child.width.value) / 2);
             break;
           case AlignElements.End:
-            child.position.setX(this.width.value - child.width.value / 2);
-            child.sceneObject.position.setX(
-              this.width.value - child.width.value / 2
-            );
+            child.position.setX((this.width.value - child.width.value) / 2);
             break;
           case AlignElements.Center:
-            child.position.setX(this.width.value / 2);
-            child.sceneObject.position.setX(this.width.value / 2);
+            child.position.setX(0);
             break;
           case AlignElements.Stretch:
-            child.width = Size.Unit(10);
-            child.position.setX(this.width.value / 2);
-            child.sceneObject.position.setX(this.width.value / 2);
-
-            let cube =
-              child.sceneObject instanceof THREE.Mesh
-                ? (child.sceneObject as THREE.Mesh)
-                : undefined;
-            if (cube) {
-              const newGeometry = new THREE.BoxGeometry(
-                this.width.value,
-                child.height.value,
-                0.1,
-                1,
-                1,
-                1
-              );
-              cube.geometry.dispose();
-              cube.geometry = newGeometry;
-            }
+            child.width = Size.Unit(this.width.value);
+            child.position.setX(0);
             break;
         }
       }
     });
 
     this.children.forEach((child) => {
-      if (child.sceneObject.parent) {
-        child.sceneObject.position.sub(child.sceneObject.parent.position);
+      let cube =
+        child.sceneObject instanceof THREE.Mesh
+          ? (child.sceneObject as THREE.Mesh)
+          : undefined;
+      if (cube) {
+        const newGeometry = new THREE.BoxGeometry(
+          child.width.value,
+          child.height.value,
+          0.1,
+          1,
+          1,
+          1
+        );
+        cube.geometry.dispose();
+        cube.geometry = newGeometry;
       }
+
+      child.sceneObject.position.setX(child.position.x);
+      child.sceneObject.position.setY(child.position.y);
+
       if (child instanceof AutoLayout) {
         child.recalculate();
       }
