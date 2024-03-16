@@ -6,13 +6,20 @@
 
 ---
 
-A web app created to make furniture designers' life easier. The main purpose of the application is to simplify and accelerate creation of complex furniture layouts. Flexibility and modularity are the key aspects of the app.
+A web app created to make furniture designers' life easier. The key feature of the application is defining complex furniture layouts in a flexible manner which simplifies and accelerates creation process.
 
 ---
 
 ## Roadmap
 
-- [ ] Define flex and grid like layouts
+- [ ] Define flex and grid like 2D layouts
+  - [x] Different measurement types: units, percentages, fractions
+  - [x] Column and row based layouts
+  - [x] Layouts nesting
+  - [ ] Paddings and gaps
+- [ ] Create examples to showcase layouts in action
+- [ ] Make layouts 3D
+- [ ] Deploy demo app
 - [ ] Allow user to create predefined components
 - [ ] Prepare project demo
 - [ ] Introduce texturing tool
