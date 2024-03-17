@@ -13,12 +13,15 @@ import {
 import { ElementSize, Size } from "./layouts/Sizes";
 
 const gui = new GUI();
-let properties = { width: 10, height: 10 };
+let properties = { width: 10, height: 10, depth: 10 };
 gui.add(properties, "width", 1, 100, 1).onChange((value: number) => {
-  redrawLayout(value, properties.height);
+  redrawLayout(value, properties.height, properties.depth);
 });
 gui.add(properties, "height", 1, 100, 1).onChange((value: number) => {
-  redrawLayout(properties.width, value);
+  redrawLayout(properties.width, value, properties.depth);
+});
+gui.add(properties, "depth", 1, 100, 1).onChange((value: number) => {
+  redrawLayout(properties.width, properties.height, value);
 });
 
 const scene = new THREE.Scene();
@@ -30,13 +33,13 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.listenToKeyEvents(window);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-redrawLayout(properties.width, properties.height);
+redrawLayout(properties.width, properties.height, properties.width);
 
 camera.position.z = 5;
 
@@ -51,30 +54,30 @@ animate();
 function createLayoutElement(
   sizeX: ElementSize,
   sizeY: ElementSize,
+  sizeZ: ElementSize,
   color: THREE.ColorRepresentation = 0xffffff
 ): LayoutElement {
   const geometry = new THREE.BoxGeometry(1, 1, 0.1);
   const material = new THREE.MeshBasicMaterial({ color: color });
   const cube = new THREE.Mesh(geometry, material);
-  return new LayoutElement(sizeX, sizeY, cube);
+  return new LayoutElement(sizeX, sizeY, sizeZ, cube);
 }
 
 function createAutoLayout(
   sizeX: ElementSize,
   sizeY: ElementSize,
+  sizeZ: ElementSize,
   props: LayoutProps,
   children: LayoutElement[]
 ): AutoLayout {
-  const geometry = new THREE.BoxGeometry(1, 1, 0.5);
-  const material = new THREE.MeshBasicMaterial({ color: 0xfff000 });
-  const cube = new THREE.Group();
+  const group = new THREE.Group();
   children.forEach((child) => {
-    cube.add(child.sceneObject);
+    group.add(child.sceneObject);
   });
-  return new AutoLayout(sizeX, sizeY, cube, props, children);
+  return new AutoLayout(sizeX, sizeY, sizeZ, group, props, children);
 }
 
-function redrawLayout(width: number, height: number) {
+function redrawLayout(width: number, height: number, depth: number) {
   cubesContainer.clear();
 
   const helperGeometry = new THREE.BoxGeometry(width, height, 0.1, 1, 1, 1);
@@ -87,17 +90,38 @@ function redrawLayout(width: number, height: number) {
   cubesContainer.add(helperBox);
 
   const differentUnitsElements = [
-    createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
-    createLayoutElement(Size.Unit(2), Size.Unit(2), 0x00ff00),
-    createLayoutElement(Size.Fraction(1), Size.Fraction(1), 0x0000ff),
-    createLayoutElement(Size.Fraction(2), Size.Fraction(1), 0xff0000),
-    createLayoutElement(Size.Percentage(10), Size.Percentage(30), 0x00ff00),
-    createLayoutElement(Size.Percentage(10), Size.Percentage(20), 0x0000ff),
+    createLayoutElement(Size.Unit(1), Size.Unit(1), Size.Unit(1), 0xff0000),
+    createLayoutElement(Size.Unit(2), Size.Unit(2), Size.Unit(2), 0x00ff00),
+    createLayoutElement(
+      Size.Fraction(1),
+      Size.Fraction(1),
+      Size.Fraction(1),
+      0x0000ff
+    ),
+    createLayoutElement(
+      Size.Fraction(2),
+      Size.Fraction(1),
+      Size.Fraction(1),
+      0xff0000
+    ),
+    createLayoutElement(
+      Size.Percentage(10),
+      Size.Percentage(30),
+      Size.Percentage(30),
+      0x00ff00
+    ),
+    createLayoutElement(
+      Size.Percentage(10),
+      Size.Percentage(20),
+      Size.Percentage(20),
+      0x0000ff
+    ),
   ];
 
   const differentUnitsLayout = new AutoLayout(
     Size.Unit(width),
     Size.Unit(height),
+    Size.Unit(depth),
     new THREE.Group(),
     {
       direction: LayoutDirection.Column,
@@ -113,8 +137,9 @@ function redrawLayout(width: number, height: number) {
   // });
 
   const justifyContentElements = [
-    createLayoutElement(Size.Unit(4), Size.Unit(1), 0xff0000),
+    createLayoutElement(Size.Unit(4), Size.Unit(1), Size.Unit(1), 0xff0000),
     createAutoLayout(
+      Size.Fraction(1),
       Size.Fraction(1),
       Size.Fraction(1),
       {
@@ -122,8 +147,9 @@ function redrawLayout(width: number, height: number) {
         alignElements: AlignElements.Stretch,
       },
       [
-        createLayoutElement(Size.Unit(2), Size.Unit(2), 0xcc0000),
+        createLayoutElement(Size.Unit(2), Size.Unit(2), Size.Unit(2), 0xfff000),
         createAutoLayout(
+          Size.Fraction(1),
           Size.Fraction(1),
           Size.Fraction(1),
           {
@@ -132,20 +158,36 @@ function redrawLayout(width: number, height: number) {
             justifyElements: JustifyElements.SpaceAround,
           },
           [
-            createLayoutElement(Size.Fraction(1), Size.Unit(1), 0x000fff),
-            createLayoutElement(Size.Fraction(1), Size.Unit(1), 0x000fff),
-            createLayoutElement(Size.Fraction(1), Size.Unit(1), 0x000fff),
+            createLayoutElement(
+              Size.Fraction(1),
+              Size.Unit(1),
+              Size.Unit(1),
+              0x000fff
+            ),
+            createLayoutElement(
+              Size.Fraction(1),
+              Size.Unit(1),
+              Size.Unit(1),
+              0x000fff
+            ),
+            createLayoutElement(
+              Size.Fraction(1),
+              Size.Unit(1),
+              Size.Unit(1),
+              0x000fff
+            ),
           ]
         ),
-        createLayoutElement(Size.Unit(1), Size.Unit(1), 0xcc0000),
+        createLayoutElement(Size.Unit(1), Size.Unit(1), Size.Unit(1), 0xfff000),
       ]
     ),
-    createLayoutElement(Size.Unit(1), Size.Unit(1), 0xff0000),
+    createLayoutElement(Size.Unit(1), Size.Unit(1), Size.Unit(1), 0xff0000),
   ];
 
   const justifyContentLayout = new AutoLayout(
     Size.Unit(width),
     Size.Unit(height),
+    Size.Unit(depth),
     new THREE.Group(),
     {
       direction: LayoutDirection.Row,

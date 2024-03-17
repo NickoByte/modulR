@@ -12,6 +12,11 @@ enum LayoutDirection {
   Row = "Row",
 }
 
+enum LayoutAxes {
+  XY = "XY",
+  ZY = "ZY",
+}
+
 enum JustifyElements {
   Start = "Start",
   End = "End",
@@ -36,6 +41,7 @@ type LayoutPadding = {
 };
 
 type LayoutProps = {
+  axes?: LayoutAxes;
   direction?: LayoutDirection;
   gap?: number;
   padding?: LayoutPadding;
@@ -49,11 +55,13 @@ class LayoutElement {
   constructor(
     public width: ElementSize,
     public height: ElementSize,
+    public depth: ElementSize,
     public sceneObject: THREE.Object3D,
     position?: THREE.Vector3
   ) {
     this.width = width;
     this.height = height;
+    this.depth = depth;
     this.position = position ?? new THREE.Vector3();
     this.sceneObject = sceneObject;
   }
@@ -63,12 +71,13 @@ class AutoLayout extends LayoutElement {
   constructor(
     width: ElementSize,
     height: ElementSize,
+    depth: ElementSize,
     sceneObject: THREE.Object3D,
     private props: LayoutProps,
     public children: LayoutElement[],
     position?: THREE.Vector3
   ) {
-    super(width, height, sceneObject, position);
+    super(width, height, depth, sceneObject, position);
   }
 
   recalculate() {
@@ -76,6 +85,9 @@ class AutoLayout extends LayoutElement {
       element.width;
     let getElementHeight = (element: LayoutElement): ElementSize =>
       element.height;
+    let getElementDepth = (element: LayoutElement): ElementSize =>
+      element.depth;
+
     let setElementWidth = (element: LayoutElement, size: ElementSize): void => {
       element.width = size;
     };
@@ -84,6 +96,9 @@ class AutoLayout extends LayoutElement {
       size: ElementSize
     ): void => {
       element.height = size;
+    };
+    let setElementDepth = (element: LayoutElement, size: ElementSize): void => {
+      element.depth = size;
     };
 
     let mainAxisSize: number;
@@ -269,6 +284,7 @@ class AutoLayout extends LayoutElement {
 
 export {
   AutoLayout,
+  LayoutAxes,
   LayoutDirection,
   JustifyElements,
   AlignElements,

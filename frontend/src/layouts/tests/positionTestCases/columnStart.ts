@@ -17,9 +17,11 @@ export const columnStartCases: Array<PositionCase> = [
       element0: new LayoutElement(
         Size.Unit(2),
         Size.Unit(2),
+        Size.Unit(2),
         new THREE.Object3D()
       ),
       element1: new LayoutElement(
+        Size.Unit(2),
         Size.Unit(2),
         Size.Unit(2),
         new THREE.Object3D()
@@ -38,9 +40,11 @@ export const columnStartCases: Array<PositionCase> = [
       element0: new LayoutElement(
         Size.Unit(2),
         Size.Unit(2),
+        Size.Unit(2),
         new THREE.Object3D()
       ),
       element1: new LayoutElement(
+        Size.Unit(2),
         Size.Unit(2),
         Size.Unit(2),
         new THREE.Object3D()
@@ -59,9 +63,11 @@ export const columnStartCases: Array<PositionCase> = [
       element0: new LayoutElement(
         Size.Unit(2),
         Size.Unit(2),
+        Size.Unit(2),
         new THREE.Object3D()
       ),
       element1: new LayoutElement(
+        Size.Unit(2),
         Size.Unit(2),
         Size.Unit(2),
         new THREE.Object3D()
@@ -80,9 +86,11 @@ export const columnStartCases: Array<PositionCase> = [
       element0: new LayoutElement(
         Size.Unit(2),
         Size.Unit(2),
+        Size.Unit(2),
         new THREE.Object3D()
       ),
       element1: new LayoutElement(
+        Size.Unit(2),
         Size.Unit(2),
         Size.Unit(2),
         new THREE.Object3D()
@@ -101,9 +109,11 @@ export const columnStartCases: Array<PositionCase> = [
       element0: new LayoutElement(
         Size.Unit(2),
         Size.Unit(2),
+        Size.Unit(2),
         new THREE.Object3D()
       ),
       element1: new LayoutElement(
+        Size.Unit(2),
         Size.Unit(2),
         Size.Unit(2),
         new THREE.Object3D()
