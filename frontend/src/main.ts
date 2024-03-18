@@ -41,7 +41,7 @@ document.body.appendChild(renderer.domElement);
 
 redrawLayout(properties.width, properties.height, properties.width);
 
-camera.position.z = 5;
+camera.position.z = 10;
 
 function animate() {
   requestAnimationFrame(animate);
@@ -130,11 +130,12 @@ function redrawLayout(width: number, height: number, depth: number) {
     differentUnitsElements
   );
 
-  // differentUnitsLayout.recalculate();
+  differentUnitsLayout.recalculate();
 
-  // differentUnitsElements.forEach((cube) => {
-  //   cubesContainer.add(cube.sceneObject);
-  // });
+  differentUnitsElements.forEach((cube) => {
+    cube.sceneObject.position.setX(cube.position.x + width + 1);
+    cubesContainer.add(cube.sceneObject);
+  });
 
   const justifyContentElements = [
     createLayoutElement(Size.Unit(4), Size.Unit(1), Size.Unit(1), 0xff0000),
