@@ -19,6 +19,8 @@ A web app created to make furniture designers' life easier. The key feature of t
   - [ ] Paddings and gaps
 - [ ] Create examples to showcase layouts in action
 - [ ] Make layouts 3D
+  - [ ] Analyze 3D layout posibilities
+  - [ ] Create real-world object using 3d layout
 - [ ] Deploy demo app
 - [ ] Allow user to create predefined components
 - [ ] Prepare project demo
