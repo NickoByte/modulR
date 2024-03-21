@@ -13,12 +13,20 @@ describe("AutoLayout", () => {
     const rootLayout = new AutoLayout(
       Size.Unit(10),
       Size.Unit(10),
+      Size.Unit(10),
       new THREE.Group(),
       {
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Stretch,
       },
-      [new LayoutElement(Size.Unit(1), Size.Unit(1), new THREE.Object3D())]
+      [
+        new LayoutElement(
+          Size.Unit(1),
+          Size.Unit(1),
+          Size.Unit(1),
+          new THREE.Object3D()
+        ),
+      ]
     );
 
     rootLayout.recalculate();
@@ -31,12 +39,20 @@ describe("AutoLayout", () => {
     const rootLayout = new AutoLayout(
       Size.Unit(10),
       Size.Unit(10),
+      Size.Unit(10),
       new THREE.Group(),
       {
         direction: LayoutDirection.Row,
         alignElements: AlignElements.Stretch,
       },
-      [new LayoutElement(Size.Unit(1), Size.Unit(1), new THREE.Object3D())]
+      [
+        new LayoutElement(
+          Size.Unit(1),
+          Size.Unit(1),
+          Size.Unit(1),
+          new THREE.Object3D()
+        ),
+      ]
     );
 
     rootLayout.recalculate();
@@ -49,6 +65,7 @@ describe("AutoLayout", () => {
     const rootLayout = new AutoLayout(
       Size.Unit(10),
       Size.Unit(10),
+      Size.Unit(10),
       new THREE.Group(),
       {
         direction: LayoutDirection.Column,
@@ -56,6 +73,7 @@ describe("AutoLayout", () => {
       },
       [
         new LayoutElement(
+          Size.Fraction(1),
           Size.Fraction(1),
           Size.Fraction(1),
           new THREE.Object3D()
@@ -74,6 +92,7 @@ describe("AutoLayout", () => {
     const rootLayout = new AutoLayout(
       Size.Unit(10),
       Size.Unit(10),
+      Size.Unit(10),
       new THREE.Group(),
       {
         direction: LayoutDirection.Column,
@@ -81,6 +100,7 @@ describe("AutoLayout", () => {
       },
       [
         new LayoutElement(
+          Size.Percentage(50),
           Size.Percentage(50),
           Size.Percentage(50),
           new THREE.Object3D()
@@ -99,6 +119,7 @@ describe("AutoLayout", () => {
     const rootLayout = new AutoLayout(
       Size.Unit(10),
       Size.Unit(10),
+      Size.Unit(10),
       new THREE.Group(),
       {
         direction: LayoutDirection.Column,
@@ -108,10 +129,17 @@ describe("AutoLayout", () => {
         new LayoutElement(
           Size.Percentage(50),
           Size.Percentage(50),
+          Size.Percentage(50),
           new THREE.Object3D()
         ),
-        new LayoutElement(Size.Unit(1), Size.Unit(1), new THREE.Object3D()),
         new LayoutElement(
+          Size.Unit(1),
+          Size.Unit(1),
+          Size.Unit(1),
+          new THREE.Object3D()
+        ),
+        new LayoutElement(
+          Size.Fraction(1),
           Size.Fraction(1),
           Size.Fraction(1),
           new THREE.Object3D()
