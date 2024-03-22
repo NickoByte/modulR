@@ -9,6 +9,7 @@ import {
   JustifyElements,
   AlignElements,
   LayoutProps,
+  LayoutAxes,
 } from "./layouts/AutoLayout";
 import { ElementSize, Size } from "./layouts/Sizes";
 
@@ -137,6 +138,55 @@ function redrawLayout(width: number, height: number, depth: number) {
     cubesContainer.add(cube.sceneObject);
   });
 
+  const differentUnitsElementsZ = [
+    createLayoutElement(Size.Unit(1), Size.Unit(1), Size.Unit(1), 0xff0000),
+    createLayoutElement(Size.Unit(2), Size.Unit(2), Size.Unit(2), 0x00ff00),
+    createLayoutElement(
+      Size.Fraction(1),
+      Size.Fraction(1),
+      Size.Fraction(1),
+      0x0000ff
+    ),
+    createLayoutElement(
+      Size.Fraction(2),
+      Size.Fraction(1),
+      Size.Fraction(1),
+      0xff0000
+    ),
+    createLayoutElement(
+      Size.Percentage(10),
+      Size.Percentage(30),
+      Size.Percentage(30),
+      0x00ff00
+    ),
+    createLayoutElement(
+      Size.Percentage(10),
+      Size.Percentage(20),
+      Size.Percentage(20),
+      0x0000ff
+    ),
+  ];
+
+  const differentUnitsLayoutZ = new AutoLayout(
+    Size.Unit(width),
+    Size.Unit(height),
+    Size.Unit(depth),
+    new THREE.Group(),
+    {
+      axes: LayoutAxes.ZY,
+      direction: LayoutDirection.Column,
+      alignElements: AlignElements.End,
+    },
+    differentUnitsElementsZ
+  );
+
+  differentUnitsLayoutZ.recalculate();
+
+  differentUnitsElementsZ.forEach((cube) => {
+    cube.sceneObject.position.setX(cube.position.x - width - 1);
+    cubesContainer.add(cube.sceneObject);
+  });
+
   const justifyContentElements = [
     createLayoutElement(Size.Unit(4), Size.Unit(1), Size.Unit(1), 0xff0000),
     createAutoLayout(
@@ -144,6 +194,7 @@ function redrawLayout(width: number, height: number, depth: number) {
       Size.Fraction(1),
       Size.Fraction(1),
       {
+        axes: LayoutAxes.XY,
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Stretch,
       },
@@ -154,6 +205,7 @@ function redrawLayout(width: number, height: number, depth: number) {
           Size.Fraction(1),
           Size.Fraction(1),
           {
+            axes: LayoutAxes.XY,
             direction: LayoutDirection.Column,
             alignElements: AlignElements.Stretch,
             justifyElements: JustifyElements.SpaceAround,
@@ -191,6 +243,7 @@ function redrawLayout(width: number, height: number, depth: number) {
     Size.Unit(depth),
     new THREE.Group(),
     {
+      axes: LayoutAxes.XY,
       direction: LayoutDirection.Row,
       alignElements: AlignElements.Stretch,
       justifyElements: JustifyElements.SpaceEvenly,
