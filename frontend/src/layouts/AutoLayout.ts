@@ -108,20 +108,38 @@ class AutoLayout extends LayoutElement {
     let setMainSize = setElementWidth;
     let setCrossSize = setElementHeight;
 
-    if (this.props.direction == LayoutDirection.Row) {
-      mainAxisSize = this.width.value;
-      crossAxisSize = this.height.value;
-      getMainSize = getElementWidth;
-      getCrossSize = getElementHeight;
-      setMainSize = setElementWidth;
-      setCrossSize = setElementHeight;
+    if (this.props.axes == LayoutAxes.XY) {
+      if (this.props.direction == LayoutDirection.Row) {
+        mainAxisSize = this.width.value;
+        crossAxisSize = this.height.value;
+        getMainSize = getElementWidth;
+        getCrossSize = getElementHeight;
+        setMainSize = setElementWidth;
+        setCrossSize = setElementHeight;
+      } else {
+        mainAxisSize = this.height.value;
+        crossAxisSize = this.width.value;
+        getMainSize = getElementHeight;
+        getCrossSize = getElementWidth;
+        setMainSize = setElementHeight;
+        setCrossSize = setElementWidth;
+      }
     } else {
-      mainAxisSize = this.height.value;
-      crossAxisSize = this.width.value;
-      getMainSize = getElementHeight;
-      getCrossSize = getElementWidth;
-      setMainSize = setElementHeight;
-      setCrossSize = setElementWidth;
+      if (this.props.direction == LayoutDirection.Row) {
+        mainAxisSize = this.depth.value;
+        crossAxisSize = this.height.value;
+        getMainSize = getElementDepth;
+        getCrossSize = getElementHeight;
+        setMainSize = setElementDepth;
+        setCrossSize = setElementHeight;
+      } else {
+        mainAxisSize = this.height.value;
+        crossAxisSize = this.depth.value;
+        getMainSize = getElementHeight;
+        getCrossSize = getElementDepth;
+        setMainSize = setElementHeight;
+        setCrossSize = setElementDepth;
+      }
     }
 
     this.children.forEach((child) => {
@@ -189,51 +207,105 @@ class AutoLayout extends LayoutElement {
     }
 
     this.children.forEach((child) => {
-      if (this.props.direction === LayoutDirection.Row) {
-        currentPositionMain += getMainSize(child).value / 2;
-        child.position.setX(currentPositionMain);
-        currentPositionMain +=
-          getMainSize(child).value / 2 + gapBetweenElements;
+      if (this.props.axes == LayoutAxes.XY) {
+        if (this.props.direction === LayoutDirection.Row) {
+          currentPositionMain += getMainSize(child).value / 2;
+          child.position.setX(currentPositionMain);
+          currentPositionMain +=
+            getMainSize(child).value / 2 + gapBetweenElements;
+        } else {
+          currentPositionMain -= getMainSize(child).value / 2;
+          child.position.setY(currentPositionMain);
+          currentPositionMain -=
+            getMainSize(child).value / 2 + gapBetweenElements;
+        }
       } else {
-        currentPositionMain -= getMainSize(child).value / 2;
-        child.position.setY(currentPositionMain);
-        currentPositionMain -=
-          getMainSize(child).value / 2 + gapBetweenElements;
+        if (this.props.direction === LayoutDirection.Row) {
+          currentPositionMain += getMainSize(child).value / 2;
+          child.position.setZ(currentPositionMain);
+          currentPositionMain +=
+            getMainSize(child).value / 2 + gapBetweenElements;
+        } else {
+          currentPositionMain -= getMainSize(child).value / 2;
+          child.position.setY(currentPositionMain);
+          currentPositionMain -=
+            getMainSize(child).value / 2 + gapBetweenElements;
+        }
       }
     });
 
     this.children.forEach((child) => {
-      if (this.props.direction == LayoutDirection.Row) {
-        switch (this.props.alignElements) {
-          case AlignElements.Start:
-            child.position.setY((this.height.value - child.height.value) / 2);
-            break;
-          case AlignElements.End:
-            child.position.setY(-(this.height.value - child.height.value) / 2);
-            break;
-          case AlignElements.Center:
-            child.position.setY(0);
-            break;
-          case AlignElements.Stretch:
-            child.height = Size.Unit(this.height.value);
-            child.position.setY(0);
-            break;
+      if (this.props.axes == LayoutAxes.XY) {
+        if (this.props.direction == LayoutDirection.Row) {
+          switch (this.props.alignElements) {
+            case AlignElements.Start:
+              child.position.setY((this.height.value - child.height.value) / 2);
+              break;
+            case AlignElements.End:
+              child.position.setY(
+                -(this.height.value - child.height.value) / 2
+              );
+              break;
+            case AlignElements.Center:
+              child.position.setY(0);
+              break;
+            case AlignElements.Stretch:
+              child.height = Size.Unit(this.height.value);
+              child.position.setY(0);
+              break;
+          }
+        } else {
+          switch (this.props.alignElements) {
+            case AlignElements.Start:
+              child.position.setX(-(this.width.value - child.width.value) / 2);
+              break;
+            case AlignElements.End:
+              child.position.setX((this.width.value - child.width.value) / 2);
+              break;
+            case AlignElements.Center:
+              child.position.setX(0);
+              break;
+            case AlignElements.Stretch:
+              child.width = Size.Unit(this.width.value);
+              child.position.setX(0);
+              break;
+          }
         }
       } else {
-        switch (this.props.alignElements) {
-          case AlignElements.Start:
-            child.position.setX(-(this.width.value - child.width.value) / 2);
-            break;
-          case AlignElements.End:
-            child.position.setX((this.width.value - child.width.value) / 2);
-            break;
-          case AlignElements.Center:
-            child.position.setX(0);
-            break;
-          case AlignElements.Stretch:
-            child.width = Size.Unit(this.width.value);
-            child.position.setX(0);
-            break;
+        if (this.props.direction == LayoutDirection.Row) {
+          switch (this.props.alignElements) {
+            case AlignElements.Start:
+              child.position.setY((this.height.value - child.height.value) / 2);
+              break;
+            case AlignElements.End:
+              child.position.setY(
+                -(this.height.value - child.height.value) / 2
+              );
+              break;
+            case AlignElements.Center:
+              child.position.setY(0);
+              break;
+            case AlignElements.Stretch:
+              child.height = Size.Unit(this.height.value);
+              child.position.setY(0);
+              break;
+          }
+        } else {
+          switch (this.props.alignElements) {
+            case AlignElements.Start:
+              child.position.setZ(-(this.width.value - child.width.value) / 2);
+              break;
+            case AlignElements.End:
+              child.position.setZ((this.width.value - child.width.value) / 2);
+              break;
+            case AlignElements.Center:
+              child.position.setZ(0);
+              break;
+            case AlignElements.Stretch:
+              child.width = Size.Unit(this.width.value);
+              child.position.setZ(0);
+              break;
+          }
         }
       }
     });
@@ -247,7 +319,7 @@ class AutoLayout extends LayoutElement {
         const newGeometry = new THREE.BoxGeometry(
           child.width.value,
           child.height.value,
-          0.1,
+          child.depth.value,
           1,
           1,
           1
@@ -258,6 +330,8 @@ class AutoLayout extends LayoutElement {
 
       child.sceneObject.position.setX(child.position.x);
       child.sceneObject.position.setY(child.position.y);
+      child.sceneObject.position.setZ(child.position.z);
+      child.sceneObject.parent = this.sceneObject;
 
       if (child instanceof AutoLayout) {
         child.recalculate();

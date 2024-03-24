@@ -1,6 +1,7 @@
 import {
   AlignElements,
   AutoLayout,
+  LayoutAxes,
   LayoutDirection,
   LayoutElement,
 } from "../AutoLayout";
@@ -16,6 +17,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
+        axes: LayoutAxes.XY,
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Stretch,
       },
@@ -42,6 +44,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
+        axes: LayoutAxes.XY,
         direction: LayoutDirection.Row,
         alignElements: AlignElements.Stretch,
       },
@@ -68,6 +71,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
+        axes: LayoutAxes.XY,
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Center,
       },
