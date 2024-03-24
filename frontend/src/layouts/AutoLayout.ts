@@ -293,16 +293,16 @@ class AutoLayout extends LayoutElement {
         } else {
           switch (this.props.alignElements) {
             case AlignElements.Start:
-              child.position.setZ(-(this.width.value - child.width.value) / 2);
+              child.position.setZ(-(this.depth.value - child.depth.value) / 2);
               break;
             case AlignElements.End:
-              child.position.setZ((this.width.value - child.width.value) / 2);
+              child.position.setZ((this.depth.value - child.depth.value) / 2);
               break;
             case AlignElements.Center:
               child.position.setZ(0);
               break;
             case AlignElements.Stretch:
-              child.width = Size.Unit(this.width.value);
+              child.depth = Size.Unit(this.depth.value);
               child.position.setZ(0);
               break;
           }

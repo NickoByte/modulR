@@ -36,7 +36,7 @@ function createAutoLayout(
   return new AutoLayout(sizeX, sizeY, sizeZ, group, props, children);
 }
 
-const differentUnitsElements = [
+const differentUnitsElements = () => [
   createLayoutElement(Size.Unit(1), Size.Unit(1), Size.Unit(1), 0xff0000),
   createLayoutElement(Size.Unit(2), Size.Unit(2), Size.Unit(2), 0x00ff00),
   createLayoutElement(
@@ -81,7 +81,7 @@ export const createDifferentUnitsLayout = (
       direction: LayoutDirection.Column,
       alignElements: AlignElements.End,
     },
-    differentUnitsElements
+    differentUnitsElements()
   );
 
 const justifyContentElements = [

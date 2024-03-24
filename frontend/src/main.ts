@@ -68,14 +68,14 @@ function redrawLayout(width: number, height: number, depth: number) {
   const helperBox = new THREE.Mesh(helperGeometry, helperMaterial);
   cubesContainer.add(helperBox);
 
-  // const differentUnitsLayoutXY = createDifferentUnitsLayout(
-  //   width,
-  //   height,
-  //   depth,
-  //   LayoutAxes.XY
-  // );
-  // differentUnitsLayoutXY.recalculate();
-  // addLayoutElementsToScene(differentUnitsLayoutXY, -width * 1.1);
+  const differentUnitsLayoutXY = createDifferentUnitsLayout(
+    width,
+    height,
+    depth,
+    LayoutAxes.XY
+  );
+  differentUnitsLayoutXY.recalculate();
+  addLayoutElementsToScene(differentUnitsLayoutXY, -width * 1.1);
 
   const nestedLayout = createNestedLayout(width, height, depth);
   nestedLayout.recalculate();
