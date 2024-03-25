@@ -1,7 +1,6 @@
 import {
   AlignElements,
   JustifyElements,
-  LayoutAxes,
   LayoutDirection,
   LayoutElement,
 } from "../../AutoLayout";
@@ -11,7 +10,7 @@ import * as THREE from "three";
 
 export const rowStartCases: Array<PositionCase> = [
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.Start,
@@ -35,7 +34,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.End,
@@ -59,7 +58,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.SpaceAround,
@@ -83,7 +82,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.SpaceBetween,
@@ -107,7 +106,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.SpaceEvenly,
@@ -132,7 +131,7 @@ export const rowStartCases: Array<PositionCase> = [
   ],
 
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.Start,
@@ -156,7 +155,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.End,
@@ -180,7 +179,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.SpaceAround,
@@ -204,7 +203,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.SpaceBetween,
@@ -228,7 +227,7 @@ export const rowStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Row,
     AlignElements.Start,
     JustifyElements.SpaceEvenly,
@@ -250,5 +249,5 @@ export const rowStartCases: Array<PositionCase> = [
       position0: new THREE.Vector3(0, 4, -2),
       position1: new THREE.Vector3(0, 4, 2),
     },
-  ]
+  ],
 ];

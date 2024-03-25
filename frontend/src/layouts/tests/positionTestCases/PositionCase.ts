@@ -1,9 +1,9 @@
 import {
   AlignElements,
   JustifyElements,
-  LayoutAxes,
   LayoutDirection,
   LayoutElement,
+  PlaneAxes,
 } from "../../AutoLayout";
 import * as THREE from "three";
 
@@ -18,7 +18,7 @@ export type ExpectedPositions = {
 };
 
 export type PositionCase = [
-  LayoutAxes,
+  PlaneAxes,
   LayoutDirection,
   AlignElements,
   JustifyElements,

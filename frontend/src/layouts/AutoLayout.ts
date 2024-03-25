@@ -6,16 +6,21 @@ import {
   Size,
   UnitSize,
 } from "./Sizes";
+import { axisToSizePropName, getDepthAxis } from "./util";
 
 enum LayoutDirection {
   Column = "Column",
   Row = "Row",
 }
 
-enum LayoutAxes {
-  XY = "XY",
-  ZY = "ZY",
-}
+type PlaneAxes = "xy" | "zy";
+
+type Axis = "x" | "y" | "z";
+type AxisSize = "width" | "height" | "depth";
+type AxisProps = {
+  name: Axis;
+  sizeName: AxisSize;
+};
 
 enum JustifyElements {
   Start = "Start",
@@ -41,7 +46,7 @@ type LayoutPadding = {
 };
 
 type LayoutProps = {
-  axes?: LayoutAxes;
+  planeAxes?: PlaneAxes;
   direction?: LayoutDirection;
   gap?: number;
   padding?: LayoutPadding;
@@ -81,91 +86,52 @@ class AutoLayout extends LayoutElement {
   }
 
   recalculate() {
-    let getElementWidth = (element: LayoutElement): ElementSize =>
-      element.width;
-    let getElementHeight = (element: LayoutElement): ElementSize =>
-      element.height;
-    let getElementDepth = (element: LayoutElement): ElementSize =>
-      element.depth;
-
-    let setElementWidth = (element: LayoutElement, size: ElementSize): void => {
-      element.width = size;
+    const mainAxisName = this.props.planeAxes![0] as Axis;
+    const crossAxisName = this.props.planeAxes![1] as Axis;
+    const depthAxisName = getDepthAxis(this.props.planeAxes!);
+    const mainAxisProps = {
+      name: mainAxisName,
+      sizeName: axisToSizePropName(mainAxisName),
     };
-    let setElementHeight = (
-      element: LayoutElement,
-      size: ElementSize
-    ): void => {
-      element.height = size;
+    const crossAxisProps = {
+      name: crossAxisName,
+      sizeName: axisToSizePropName(crossAxisName),
     };
-    let setElementDepth = (element: LayoutElement, size: ElementSize): void => {
-      element.depth = size;
+    const depthAxisProps = {
+      name: depthAxisName,
+      sizeName: axisToSizePropName(depthAxisName),
     };
 
-    let mainAxisSize: number;
-    let crossAxisSize: number;
-    let getMainSize = getElementWidth;
-    let getCrossSize = getElementHeight;
-    let setMainSize = setElementWidth;
-    let setCrossSize = setElementHeight;
-
-    if (this.props.axes == LayoutAxes.XY) {
-      if (this.props.direction == LayoutDirection.Row) {
-        mainAxisSize = this.width.value;
-        crossAxisSize = this.height.value;
-        getMainSize = getElementWidth;
-        getCrossSize = getElementHeight;
-        setMainSize = setElementWidth;
-        setCrossSize = setElementHeight;
-      } else {
-        mainAxisSize = this.height.value;
-        crossAxisSize = this.width.value;
-        getMainSize = getElementHeight;
-        getCrossSize = getElementWidth;
-        setMainSize = setElementHeight;
-        setCrossSize = setElementWidth;
-      }
-    } else {
-      if (this.props.direction == LayoutDirection.Row) {
-        mainAxisSize = this.depth.value;
-        crossAxisSize = this.height.value;
-        getMainSize = getElementDepth;
-        getCrossSize = getElementHeight;
-        setMainSize = setElementDepth;
-        setCrossSize = setElementHeight;
-      } else {
-        mainAxisSize = this.height.value;
-        crossAxisSize = this.depth.value;
-        getMainSize = getElementHeight;
-        getCrossSize = getElementDepth;
-        setMainSize = setElementHeight;
-        setCrossSize = setElementDepth;
-      }
-    }
+    let mainAxisLength = this[mainAxisProps.sizeName].value;
+    let crossAxisLength = this[crossAxisProps.sizeName].value;
 
     this.children.forEach((child) => {
-      let size = getMainSize(child);
+      let size = child[mainAxisProps.sizeName];
       if (size instanceof PercentageSize) {
-        setMainSize(child, size.asUnitSize(mainAxisSize));
-        setCrossSize(child, size.asUnitSize(crossAxisSize));
+        child[mainAxisProps.sizeName] = size.asUnitSize(mainAxisLength);
+        child[crossAxisProps.sizeName] = size.asUnitSize(crossAxisLength);
       }
     });
 
     const unitSizes = this.children
-      .filter((c) => getMainSize(c) instanceof UnitSize)
-      .map((c) => getMainSize(c) as UnitSize);
+      .filter((child) => child[mainAxisProps.sizeName] instanceof UnitSize)
+      .map((child) => child[mainAxisProps.sizeName] as UnitSize);
     const totalUnits = this.getTotalUnits(unitSizes);
-    const remainingSpace = mainAxisSize - totalUnits;
+    const remainingSpace = mainAxisLength - totalUnits;
 
     const fractionSizes = this.children
-      .filter((c) => getMainSize(c) instanceof FractionSize)
-      .map((c) => getMainSize(c) as FractionSize);
+      .filter((child) => child[mainAxisProps.sizeName] instanceof FractionSize)
+      .map((child) => child[mainAxisProps.sizeName] as FractionSize);
     const totalFractions = this.getTotalFractions(fractionSizes);
 
     this.children.forEach((child) => {
-      let size = getMainSize(child);
+      let size = child[mainAxisProps.sizeName];
       if (size instanceof FractionSize) {
-        setMainSize(child, size.asUnitSize(remainingSpace, totalFractions));
-        setCrossSize(child, Size.Unit(crossAxisSize));
+        child[mainAxisProps.sizeName] = size.asUnitSize(
+          remainingSpace,
+          totalFractions
+        );
+        child[crossAxisProps.sizeName] = Size.Unit(crossAxisLength);
       }
     });
 
@@ -207,106 +173,43 @@ class AutoLayout extends LayoutElement {
     }
 
     this.children.forEach((child) => {
-      if (this.props.axes == LayoutAxes.XY) {
-        if (this.props.direction === LayoutDirection.Row) {
-          currentPositionMain += getMainSize(child).value / 2;
-          child.position.setX(currentPositionMain);
-          currentPositionMain +=
-            getMainSize(child).value / 2 + gapBetweenElements;
-        } else {
-          currentPositionMain -= getMainSize(child).value / 2;
-          child.position.setY(currentPositionMain);
-          currentPositionMain -=
-            getMainSize(child).value / 2 + gapBetweenElements;
-        }
+      if (this.props.direction === LayoutDirection.Row) {
+        currentPositionMain += child[mainAxisProps.sizeName].value / 2;
+        child.position[mainAxisProps.name] = currentPositionMain;
+        currentPositionMain +=
+          child[mainAxisProps.sizeName].value / 2 + gapBetweenElements;
       } else {
-        if (this.props.direction === LayoutDirection.Row) {
-          currentPositionMain += getMainSize(child).value / 2;
-          child.position.setZ(currentPositionMain);
-          currentPositionMain +=
-            getMainSize(child).value / 2 + gapBetweenElements;
-        } else {
-          currentPositionMain -= getMainSize(child).value / 2;
-          child.position.setY(currentPositionMain);
-          currentPositionMain -=
-            getMainSize(child).value / 2 + gapBetweenElements;
-        }
+        currentPositionMain -= child[mainAxisProps.sizeName].value / 2;
+        child.position[crossAxisProps.name] = currentPositionMain;
+        currentPositionMain -=
+          child[mainAxisProps.sizeName].value / 2 + gapBetweenElements;
       }
     });
 
     this.children.forEach((child) => {
-      if (this.props.axes == LayoutAxes.XY) {
-        if (this.props.direction == LayoutDirection.Row) {
-          switch (this.props.alignElements) {
-            case AlignElements.Start:
-              child.position.setY((this.height.value - child.height.value) / 2);
-              break;
-            case AlignElements.End:
-              child.position.setY(
-                -(this.height.value - child.height.value) / 2
-              );
-              break;
-            case AlignElements.Center:
-              child.position.setY(0);
-              break;
-            case AlignElements.Stretch:
-              child.height = Size.Unit(this.height.value);
-              child.position.setY(0);
-              break;
-          }
-        } else {
-          switch (this.props.alignElements) {
-            case AlignElements.Start:
-              child.position.setX(-(this.width.value - child.width.value) / 2);
-              break;
-            case AlignElements.End:
-              child.position.setX((this.width.value - child.width.value) / 2);
-              break;
-            case AlignElements.Center:
-              child.position.setX(0);
-              break;
-            case AlignElements.Stretch:
-              child.width = Size.Unit(this.width.value);
-              child.position.setX(0);
-              break;
-          }
-        }
-      } else {
-        if (this.props.direction == LayoutDirection.Row) {
-          switch (this.props.alignElements) {
-            case AlignElements.Start:
-              child.position.setY((this.height.value - child.height.value) / 2);
-              break;
-            case AlignElements.End:
-              child.position.setY(
-                -(this.height.value - child.height.value) / 2
-              );
-              break;
-            case AlignElements.Center:
-              child.position.setY(0);
-              break;
-            case AlignElements.Stretch:
-              child.height = Size.Unit(this.height.value);
-              child.position.setY(0);
-              break;
-          }
-        } else {
-          switch (this.props.alignElements) {
-            case AlignElements.Start:
-              child.position.setZ(-(this.depth.value - child.depth.value) / 2);
-              break;
-            case AlignElements.End:
-              child.position.setZ((this.depth.value - child.depth.value) / 2);
-              break;
-            case AlignElements.Center:
-              child.position.setZ(0);
-              break;
-            case AlignElements.Stretch:
-              child.depth = Size.Unit(this.depth.value);
-              child.position.setZ(0);
-              break;
-          }
-        }
+      switch (this.props.alignElements) {
+        case AlignElements.Start:
+          child.position[crossAxisProps.name] =
+            (this[crossAxisProps.sizeName].value -
+              child[crossAxisProps.sizeName].value) /
+            2;
+          break;
+        case AlignElements.End:
+          child.position[crossAxisProps.name] =
+            -(
+              this[crossAxisProps.sizeName].value -
+              child[crossAxisProps.sizeName].value
+            ) / 2;
+          break;
+        case AlignElements.Center:
+          child.position[crossAxisProps.name] = 0;
+          break;
+        case AlignElements.Stretch:
+          child[crossAxisProps.sizeName] = Size.Unit(
+            this[crossAxisProps.sizeName].value
+          );
+          child.position[crossAxisProps.name] = 0;
+          break;
       }
     });
 
@@ -358,7 +261,8 @@ class AutoLayout extends LayoutElement {
 
 export {
   AutoLayout,
-  LayoutAxes,
+  type PlaneAxes,
+  type Axis,
   LayoutDirection,
   JustifyElements,
   AlignElements,

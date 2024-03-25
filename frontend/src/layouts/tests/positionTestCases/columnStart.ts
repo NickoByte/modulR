@@ -1,7 +1,6 @@
 import {
   AlignElements,
   JustifyElements,
-  LayoutAxes,
   LayoutDirection,
   LayoutElement,
 } from "../../AutoLayout";
@@ -11,7 +10,7 @@ import * as THREE from "three";
 
 export const columnStartCases: Array<PositionCase> = [
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.Start,
@@ -35,7 +34,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.End,
@@ -59,7 +58,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.SpaceAround,
@@ -83,7 +82,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.SpaceBetween,
@@ -107,7 +106,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.XY,
+    "xy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.SpaceEvenly,
@@ -132,7 +131,7 @@ export const columnStartCases: Array<PositionCase> = [
   ],
 
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.Start,
@@ -156,7 +155,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.End,
@@ -180,7 +179,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.SpaceAround,
@@ -204,7 +203,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.SpaceBetween,
@@ -228,7 +227,7 @@ export const columnStartCases: Array<PositionCase> = [
     },
   ],
   [
-    LayoutAxes.ZY,
+    "zy",
     LayoutDirection.Column,
     AlignElements.Start,
     JustifyElements.SpaceEvenly,

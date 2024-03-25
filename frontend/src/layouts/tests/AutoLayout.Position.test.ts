@@ -6,7 +6,7 @@ import { columnStartCases } from "./positionTestCases/columnStart";
 import { rowStartCases } from "./positionTestCases/rowStart";
 
 describe("AutoLayout", () => {
-  describe("Child Position XY", () => {
+  describe("Child Position", () => {
     test.each(columnStartCases.concat(rowStartCases))(
       `Axes: %s, Direction: %s, Alignment: %s, Justify: %s`,
       (
@@ -23,7 +23,7 @@ describe("AutoLayout", () => {
           Size.Unit(10),
           new THREE.Group(),
           {
-            axes: axes,
+            planeAxes: axes,
             direction: direction,
             alignElements: alignElements,
             justifyElements: justifyElements,

@@ -1,7 +1,6 @@
 import {
   AlignElements,
   AutoLayout,
-  LayoutAxes,
   LayoutDirection,
   LayoutElement,
 } from "../AutoLayout";
@@ -17,7 +16,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
-        axes: LayoutAxes.XY,
+        planeAxes: "xy",
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Stretch,
       },
@@ -44,7 +43,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
-        axes: LayoutAxes.XY,
+        planeAxes: "xy",
         direction: LayoutDirection.Row,
         alignElements: AlignElements.Stretch,
       },
@@ -71,7 +70,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
-        axes: LayoutAxes.XY,
+        planeAxes: "xy",
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Center,
       },
@@ -156,13 +155,16 @@ describe("AutoLayout", () => {
     const firstChild = rootLayout.children[0];
     expect(firstChild.height.value).toBe(5);
     expect(firstChild.width.value).toBe(5);
+    expect(firstChild.depth.value).toBe(5);
 
     const secondChild = rootLayout.children[1];
     expect(secondChild.height.value).toBe(1);
     expect(secondChild.width.value).toBe(1);
+    expect(firstChild.depth.value).toBe(1);
 
     const thirdChild = rootLayout.children[2];
     expect(thirdChild.height.value).toBe(4);
     expect(thirdChild.width.value).toBe(10);
+    expect(firstChild.depth.value).toBe(4);
   });
 });

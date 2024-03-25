@@ -7,7 +7,7 @@ import {
   JustifyElements,
   AlignElements,
   LayoutProps,
-  LayoutAxes,
+  PlaneAxes,
 } from "../AutoLayout";
 
 function createLayoutElement(
@@ -69,7 +69,7 @@ export const createDifferentUnitsLayout = (
   width: number,
   height: number,
   depth: number,
-  axes: LayoutAxes
+  axes: PlaneAxes
 ): AutoLayout =>
   new AutoLayout(
     Size.Unit(width),
@@ -77,7 +77,7 @@ export const createDifferentUnitsLayout = (
     Size.Unit(depth),
     new THREE.Group(),
     {
-      axes: axes,
+      planeAxes: axes,
       direction: LayoutDirection.Column,
       alignElements: AlignElements.End,
     },
@@ -91,7 +91,7 @@ const justifyContentElements = [
     Size.Fraction(1),
     Size.Fraction(1),
     {
-      axes: LayoutAxes.XY,
+      planeAxes: "xy",
       direction: LayoutDirection.Column,
       alignElements: AlignElements.Stretch,
     },
@@ -102,7 +102,7 @@ const justifyContentElements = [
         Size.Fraction(1),
         Size.Fraction(1),
         {
-          axes: LayoutAxes.XY,
+          planeAxes: "xy",
           direction: LayoutDirection.Column,
           alignElements: AlignElements.Stretch,
           justifyElements: JustifyElements.SpaceAround,
@@ -145,7 +145,7 @@ export const createNestedLayout = (
     Size.Unit(depth),
     new THREE.Group(),
     {
-      axes: LayoutAxes.XY,
+      planeAxes: "xy",
       direction: LayoutDirection.Row,
       alignElements: AlignElements.Stretch,
       justifyElements: JustifyElements.SpaceEvenly,

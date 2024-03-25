@@ -2,16 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import {
-  AutoLayout,
-  LayoutElement,
-  LayoutDirection,
-  JustifyElements,
-  AlignElements,
-  LayoutProps,
-  LayoutAxes,
-} from "./layouts/AutoLayout";
-import { ElementSize, Size } from "./layouts/Sizes";
+import { AutoLayout } from "./layouts/AutoLayout";
 import {
   createDifferentUnitsLayout,
   createNestedLayout,
@@ -72,7 +63,7 @@ function redrawLayout(width: number, height: number, depth: number) {
     width,
     height,
     depth,
-    LayoutAxes.XY
+    "xy"
   );
   differentUnitsLayoutXY.recalculate();
   addLayoutElementsToScene(differentUnitsLayoutXY, -width * 1.1);
@@ -85,7 +76,7 @@ function redrawLayout(width: number, height: number, depth: number) {
     width,
     height,
     depth,
-    LayoutAxes.ZY
+    "zy"
   );
   differentUnitsLayoutZY.recalculate();
   addLayoutElementsToScene(differentUnitsLayoutZY, 0);
