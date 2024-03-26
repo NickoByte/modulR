@@ -98,6 +98,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
+        planeAxes: "xy",
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Center,
       },
@@ -125,6 +126,7 @@ describe("AutoLayout", () => {
       Size.Unit(10),
       new THREE.Group(),
       {
+        planeAxes: "xy",
         direction: LayoutDirection.Column,
         alignElements: AlignElements.Center,
       },
