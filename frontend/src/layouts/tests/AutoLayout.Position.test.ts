@@ -4,6 +4,10 @@ import * as THREE from "three";
 import { describe, expect, test } from "vitest";
 import { columnStartCases } from "./positionTestCases/columnStart";
 import { rowStartCases } from "./positionTestCases/rowStart";
+import {
+  singleElementColumnCases,
+  singleElementRowCases,
+} from "./positionTestCases/singleElement";
 
 describe("AutoLayout", () => {
   describe("Child Position", () => {
@@ -42,6 +46,41 @@ describe("AutoLayout", () => {
         expect(secondChild.position.x).toBe(expectedPositions.position1.x);
         expect(secondChild.position.y).toBe(expectedPositions.position1.y);
         expect(secondChild.position.z).toBe(expectedPositions.position1.z);
+      }
+    );
+  });
+
+  describe("One Element Position", () => {
+    test.each(singleElementColumnCases.concat(singleElementRowCases))(
+      `Axes: %s, Direction: %s, Alignment: %s, Justify: %s`,
+      (
+        axes,
+        direction,
+        alignElements,
+        justifyElements,
+        layoutElement,
+        expectedPosition
+      ) => {
+        const rootLayout = new AutoLayout(
+          Size.Unit(10),
+          Size.Unit(10),
+          Size.Unit(10),
+          new THREE.Group(),
+          {
+            planeAxes: axes,
+            direction: direction,
+            alignElements: alignElements,
+            justifyElements: justifyElements,
+          },
+          [layoutElement]
+        );
+
+        rootLayout.recalculate();
+
+        const child = rootLayout.children[0];
+        expect(child.position.x).toBe(expectedPosition.x);
+        expect(child.position.y).toBe(expectedPosition.y);
+        expect(child.position.z).toBe(expectedPosition.z);
       }
     );
   });

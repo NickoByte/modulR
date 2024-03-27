@@ -25,3 +25,12 @@ export type PositionCase = [
   PositionCaseElements,
   ExpectedPositions
 ];
+
+export type SingleElementCase = [
+  PlaneAxes,
+  LayoutDirection,
+  AlignElements,
+  JustifyElements,
+  LayoutElement,
+  THREE.Vector3
+];
